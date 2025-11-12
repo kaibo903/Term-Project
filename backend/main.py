@@ -17,15 +17,20 @@ app = FastAPI(
 # 從環境變數讀取允許的前端來源
 # 支援多個來源，用逗號分隔
 frontend_urls = os.getenv("FRONTEND_URL", "http://localhost:5173")
-allowed_origins = [url.strip() for url in frontend_urls.split(",")]
+allowed_origins = [url.strip() for url in frontend_urls.split(",") if url.strip()]
+
 # 開發環境也允許 localhost
 if "http://localhost:5173" not in allowed_origins:
     allowed_origins.append("http://localhost:5173")
 
 # 設定 CORS 中間件，允許前端跨域請求
+# 自動允許所有 Vercel 域名（包括 Preview 部署）
+# 注意：FastAPI 的 CORS 不支援通配符，所以我們需要明確列出所有允許的來源
+# 或者使用 allow_origin_regex 來支援 Vercel 域名模式
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",  # 允許所有 Vercel 域名
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
