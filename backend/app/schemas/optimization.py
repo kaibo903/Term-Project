@@ -14,9 +14,13 @@ class OptimizationRequest(BaseModel):
     mode: str = Field(..., description="決策模式：budget_to_duration 或 duration_to_cost")
     budget_constraint: Optional[Decimal] = Field(None, description="預算約束（模式一）", gt=0)
     duration_constraint: Optional[int] = Field(None, description="工期約束（模式二）", gt=0)
-    indirect_cost: Decimal = Field(0.0, description="間接成本（每日）", ge=0)
-    penalty_rate: Decimal = Field(0.0, description="逾期違約金率（每日）", ge=0)
-    bonus_rate: Decimal = Field(0.0, description="趕工獎金率（每日）", ge=0)
+    indirect_cost: Optional[Decimal] = Field(0.0, description="間接成本（每日）", ge=0)
+    # 違約金計算方式
+    penalty_type: str = Field('rate', description="違約金計算方式：'fixed' 定額 或 'rate' 比率")
+    penalty_amount: Optional[Decimal] = Field(None, description="定額違約金（每日，當 penalty_type='fixed' 時使用）", ge=0)
+    penalty_rate: Optional[Decimal] = Field(None, description="比率違約金（每日，契約金額比率，當 penalty_type='rate' 時使用）", ge=0)
+    contract_amount: Optional[Decimal] = Field(0.0, description="契約決標總價（用於計算違約金上限和趕工費用）", ge=0)
+    contract_duration: Optional[int] = Field(None, description="契約工期（天，用於計算趕工費用）", gt=0)
     target_duration: Optional[int] = Field(None, description="目標工期（用於計算獎懲）", gt=0)
 
     @field_validator('mode')
@@ -25,6 +29,27 @@ class OptimizationRequest(BaseModel):
         """驗證決策模式"""
         if v not in ['budget_to_duration', 'duration_to_cost']:
             raise ValueError('決策模式必須是 budget_to_duration 或 duration_to_cost')
+        return v
+    
+    @field_validator('penalty_type')
+    @classmethod
+    def validate_penalty_type(cls, v):
+        """驗證違約金計算方式"""
+        if v not in ['fixed', 'rate']:
+            raise ValueError('違約金計算方式必須是 fixed（定額）或 rate（比率）')
+        return v
+    
+    @field_validator('penalty_amount', 'penalty_rate')
+    @classmethod
+    def validate_penalty_params(cls, v, info):
+        """驗證違約金參數"""
+        penalty_type = info.data.get('penalty_type', 'rate')
+        if penalty_type == 'fixed':
+            if 'penalty_amount' in info.data and info.data['penalty_amount'] is None:
+                raise ValueError('定額計算方式必須提供 penalty_amount（定額違約金）')
+        elif penalty_type == 'rate':
+            if 'penalty_rate' in info.data and info.data['penalty_rate'] is None:
+                raise ValueError('比率計算方式必須提供 penalty_rate（違約金率）')
         return v
 
     @field_validator('budget_constraint', 'duration_constraint')

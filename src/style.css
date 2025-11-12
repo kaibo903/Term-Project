@@ -1,35 +1,36 @@
-/* 簡約側邊欄風格 - 全局樣式 */
+/* 無印風格 - 全局樣式 */
 
 :root {
-  /* 簡約配色系統 */
-  --sidebar-bg: #2C3E50;              /* 側邊欄背景 - 深灰藍 */
-  --sidebar-active: #3498DB;          /* 側邊欄激活色 - 藍色 */
-  --sidebar-hover: #34495E;           /* 側邊欄懸停 - 稍淺灰 */
-  --header-bg: #34495E;               /* 頂部欄背景 - 深灰 */
-  --content-bg: #F5F7FA;              /* 主內容背景 - 淺灰 */
-  --card-bg: #FFFFFF;                  /* 卡片背景 - 白色 */
-  --text-primary: #2C3E50;            /* 主要文字 - 深灰 */
-  --text-secondary: #7F8C8D;          /* 次要文字 - 中灰 */
-  --text-light: #BDC3C7;              /* 淺色文字 */
+  /* 無印風格配色系統 - 灰白色系 */
+  --sidebar-bg: #F5F5F5;              /* 側邊欄背景 - 淺灰 */
+  --sidebar-active: #E8E8E8;          /* 側邊欄激活色 - 稍深灰 */
+  --sidebar-hover: #EEEEEE;           /* 側邊欄懸停 - 中淺灰 */
+  --header-bg: #FFFFFF;               /* 頂部欄背景 - 純白 */
+  --content-bg: #FAFAFA;              /* 主內容背景 - 極淺灰 */
+  --card-bg: #FFFFFF;                  /* 卡片背景 - 純白 */
+  --text-primary: #333333;            /* 主要文字 - 深灰 */
+  --text-secondary: #666666;          /* 次要文字 - 中灰 */
+  --text-light: #999999;              /* 淺色文字 */
   --text-white: #FFFFFF;               /* 白色文字 */
-  --border-color: #E1E8ED;            /* 邊框色 */
-  --border-light: #F0F3F5;            /* 淺邊框 */
+  --border-color: #E0E0E0;            /* 邊框色 - 淺灰 */
+  --border-light: #F0F0F0;            /* 淺邊框 - 極淺灰 */
   
-  /* 強調色 */
-  --primary: #3498DB;                  /* 主色 - 藍色 */
-  --primary-hover: #2980B9;           /* 主色懸停 */
-  --success: #27AE60;                  /* 成功色 */
-  --warning: #F39C12;                  /* 警告色 */
-  --danger: #E74C3C;                   /* 危險色 */
+  /* 強調色 - 無印良品風格 */
+  --primary: #C85A4F;                  /* 主色 - 無印紅（柔和磚紅色） */
+  --primary-hover: #B04A3F;           /* 主色懸停 - 稍深無印紅 */
+  --success: #7A9B7A;                  /* 成功色 - 柔和綠色 */
+  --warning: #C9A882;                  /* 警告色 - 柔和橙色 */
+  --danger: #C85A4F;                   /* 危險色 - 無印紅 */
   
-  /* 陰影 */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* 陰影 - 極輕微 */
+  --shadow-sm: 0 1px 1px rgba(0, 0, 0, 0.02);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.04);
   
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
-  line-height: 1.6;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', 'Microsoft JhengHei', 'Hiragino Sans GB', sans-serif;
+  line-height: 1.8;
   font-weight: 400;
+  letter-spacing: 0.01em;
   
   color: var(--text-primary);
   background-color: var(--content-bg);
@@ -66,27 +67,30 @@ body {
   overflow: hidden;
 }
 
-/* 簡約按鈕樣式 */
+/* 無印風格按鈕樣式 */
 button {
   font-family: inherit;
   font-size: 14px;
-  font-weight: 500;
-  border: none;
-  background-color: var(--primary);
-  color: white;
+  font-weight: 400;
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
-  border-radius: 6px;
-  padding: 8px 16px;
+  border-radius: 2px;
+  padding: 10px 20px;
+  box-shadow: none;
 }
 
 button:hover {
-  background-color: var(--primary-hover);
+  background-color: var(--content-bg);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 button:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+  outline: 1px solid var(--primary);
+  outline-offset: 1px;
 }
 
 /* 連結樣式 */
@@ -119,36 +123,38 @@ h3 {
   font-size: 18px;
 }
 
-/* 輸入框樣式 */
+/* 無印風格輸入框樣式 */
 input, textarea, select {
   font-family: inherit;
   font-size: 14px;
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   background-color: var(--card-bg);
-  border-radius: 6px;
+  border-radius: 0;
   transition: all 0.2s ease;
-  padding: 8px 12px;
+  padding: 10px 12px;
+  box-shadow: none;
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+  box-shadow: none;
+  background-color: var(--card-bg);
 }
 
-/* 簡約卡片樣式 */
+/* 無印風格卡片樣式 */
 .content-card {
   background-color: var(--card-bg);
-  border: 1px solid var(--border-light);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  border-radius: 0;
+  box-shadow: none;
 }
 
-/* 簡約滾動條樣式 */
+/* 無印風格滾動條樣式 */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -157,7 +163,7 @@ input:focus, textarea:focus, select:focus {
 
 ::-webkit-scrollbar-thumb {
   background: var(--border-color);
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {

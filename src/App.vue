@@ -3,9 +3,9 @@
     <!-- 頂部導航欄 -->
     <header class="app-header">
       <div class="header-left">
-        <div class="logo">
+        <div class="logo" @click="goToProjects">
           <el-icon class="logo-icon"><TrendCharts /></el-icon>
-          <span class="logo-text">營造廠決策分析平台</span>
+          <span class="logo-text">Project Test</span>
         </div>
       </div>
       <div class="header-right">
@@ -21,7 +21,6 @@
       <!-- 左側邊欄 -->
       <aside class="app-sidebar">
         <nav class="sidebar-nav">
-          <div class="nav-title">工程管理系統</div>
           <router-link
             to="/projects"
             class="nav-item"
@@ -36,7 +35,7 @@
             :class="{ active: activeMenu === '/optimization' }"
           >
             <el-icon><TrendCharts /></el-icon>
-            <span>投標優化</span>
+            <span>進度成本最佳化</span>
           </router-link>
         </nav>
       </aside>
@@ -44,22 +43,28 @@
       <!-- 主要內容區域 -->
       <main class="app-main">
         <router-view />
-      </main>
+  </main>
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { TrendCharts, User, ArrowDown, House } from '@element-plus/icons-vue'
 
 const route = useRoute()
+const router = useRouter()
 
 // 計算當前啟用的選單項
 const activeMenu = computed(() => {
   return route.path
 })
+
+// 點擊 logo 返回專案管理頁面
+const goToProjects = () => {
+  router.push('/projects')
+}
 </script>
 
 <style scoped>
@@ -72,17 +77,18 @@ const activeMenu = computed(() => {
   overflow: hidden;
 }
 
-/* 頂部導航欄 - 簡約深色 */
+/* 頂部導航欄 - 無印風格 */
 .app-header {
   width: 100%;
-  height: 60px;
+  height: 64px;
   background-color: var(--header-bg);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 40px;
   flex-shrink: 0;
-  box-shadow: var(--shadow);
+  box-shadow: 0 1px 0 0 var(--border-color);
+  border-bottom: 1px solid var(--border-color);
   z-index: 100;
 }
 
@@ -95,17 +101,24 @@ const activeMenu = computed(() => {
   display: flex;
   align-items: center;
   gap: 12px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.logo:hover {
+  opacity: 0.8;
 }
 
 .logo-icon {
-  font-size: 24px;
-  color: var(--text-white);
+  font-size: 20px;
+  color: var(--text-primary);
 }
 
 .logo-text {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-white);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
 }
 
 .header-right {
@@ -117,16 +130,18 @@ const activeMenu = computed(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--text-white);
+  color: var(--text-primary);
   font-size: 14px;
   cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
+  padding: 8px 16px;
+  border-radius: 0;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
 .user-info:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--content-bg);
+  border-color: var(--border-color);
 }
 
 .user-icon {
@@ -144,98 +159,107 @@ const activeMenu = computed(() => {
   overflow: hidden;
 }
 
-/* 左側邊欄 - 簡約深色 */
+/* 左側邊欄 - 無印風格 */
 .app-sidebar {
-  width: 240px;
+  width: 260px;
   background-color: var(--sidebar-bg);
   flex-shrink: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  border-right: 1px solid var(--border-color);
 }
 
 .sidebar-nav {
-  padding: 20px 0;
+  padding: 32px 0;
 }
 
 .nav-title {
-  padding: 0 20px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-white);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  padding: 0 32px 20px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  text-transform: none;
+  letter-spacing: 0.1em;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 20px;
-  color: rgba(255, 255, 255, 0.8);
+  padding: 14px 32px;
+  color: var(--text-primary);
   font-size: 14px;
+  font-weight: 400;
   text-decoration: none;
   transition: all 0.2s ease;
-  border-left: 3px solid transparent;
+  border-left: 2px solid transparent;
+  border-right: none;
 }
 
 .nav-item:hover {
   background-color: var(--sidebar-hover);
-  color: var(--text-white);
+  color: var(--text-primary);
 }
 
 .nav-item.active {
   background-color: var(--sidebar-active);
-  color: var(--text-white);
-  border-left-color: var(--text-white);
-  font-weight: 500;
+  color: var(--text-primary);
+  border-left-color: var(--primary);
+  font-weight: 400;
 }
 
 .nav-item .el-icon {
   font-size: 18px;
 }
 
-/* 主要內容區域 - 白色背景 */
+/* 主要內容區域 - 無印風格 */
 .app-main {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   background-color: var(--content-bg);
-  padding: 24px;
+  padding: 40px;
+  height: calc(100vh - 64px);
 }
 </style>
 
 <style>
-/* 簡約風格全局樣式覆蓋 Element Plus */
+/* 無印風格全局樣式覆蓋 Element Plus */
 .el-card {
-  border: 1px solid var(--border-light) !important;
-  border-radius: 8px !important;
-  box-shadow: var(--shadow) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   background-color: var(--card-bg) !important;
 }
 
 .el-card__header {
-  border-bottom: 1px solid var(--border-light) !important;
-  padding: 16px 20px !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 24px 32px !important;
   background-color: var(--card-bg) !important;
 }
 
 .el-card__body {
-  padding: 20px !important;
+  padding: 32px !important;
 }
 
 .el-button {
-  border-radius: 6px !important;
-  font-weight: 500 !important;
+  border-radius: 0 !important;
+  font-weight: 400 !important;
+  border: 1px solid var(--border-color) !important;
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
 }
 
 .el-button--primary {
   background-color: var(--primary) !important;
   border-color: var(--primary) !important;
+  color: var(--text-white) !important;
 }
 
 .el-button--primary:hover {
   background-color: var(--primary-hover) !important;
   border-color: var(--primary-hover) !important;
+  color: var(--text-white) !important;
 }
 
 .el-button--success {
@@ -254,8 +278,9 @@ const activeMenu = computed(() => {
 }
 
 .el-input__wrapper {
-  border-radius: 6px !important;
+  border-radius: 0 !important;
   border-color: var(--border-color) !important;
+  box-shadow: none !important;
 }
 
 .el-input__wrapper:hover {
@@ -264,19 +289,20 @@ const activeMenu = computed(() => {
 
 .el-input.is-focus .el-input__wrapper {
   border-color: var(--primary) !important;
+  box-shadow: none !important;
 }
 
 .el-table {
-  border: 1px solid var(--border-light) !important;
-  border-radius: 8px !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 0 !important;
   overflow: hidden !important;
 }
 
 .el-table th {
-  background-color: #F8F9FA !important;
+  background-color: var(--content-bg) !important;
   color: var(--text-primary) !important;
   border-bottom: 1px solid var(--border-color) !important;
-  font-weight: 600 !important;
+  font-weight: 400 !important;
 }
 
 .el-table td {
@@ -284,40 +310,41 @@ const activeMenu = computed(() => {
 }
 
 .el-table--striped .el-table__body tr.el-table__row--striped td {
-  background-color: #FAFBFC !important;
+  background-color: var(--content-bg) !important;
 }
 
 .el-table__row:hover {
-  background-color: #F5F7FA !important;
+  background-color: var(--sidebar-hover) !important;
 }
 
 .el-dialog {
-  border-radius: 8px !important;
-  border: 1px solid var(--border-light) !important;
-  box-shadow: var(--shadow-md) !important;
+  border-radius: 0 !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: none !important;
 }
 
 .el-dialog__header {
-  border-bottom: 1px solid var(--border-light) !important;
-  padding: 20px !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 32px !important;
 }
 
 .el-dialog__body {
-  padding: 20px !important;
+  padding: 32px !important;
 }
 
 .el-form-item__label {
   color: var(--text-primary) !important;
-  font-weight: 500 !important;
+  font-weight: 400 !important;
 }
 
 .el-tag {
-  border-radius: 4px !important;
-  font-weight: 500 !important;
+  border-radius: 0 !important;
+  font-weight: 400 !important;
+  border: 1px solid var(--border-color) !important;
 }
 
 .el-select .el-input__wrapper {
-  border-radius: 6px !important;
+  border-radius: 0 !important;
 }
 
 .el-radio {
@@ -330,7 +357,7 @@ const activeMenu = computed(() => {
 }
 
 .el-descriptions {
-  border-radius: 8px !important;
+  border-radius: 0 !important;
 }
 
 .el-descriptions__label {

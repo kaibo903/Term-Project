@@ -14,7 +14,7 @@ export async function exportToExcel(result) {
   
   // 1. 結果摘要工作表
   const summaryData = [
-    ['投標最佳化決策報告'],
+    ['進度成本最佳化決策報告'],
     [''],
     ['結果摘要'],
     ['最優工期（天）', result.optimal_duration],
@@ -79,7 +79,7 @@ export async function exportToExcel(result) {
   }
   
   // 儲存 Excel 檔案
-  const fileName = `投標優化報告_${new Date().toISOString().split('T')[0]}.xlsx`
+  const fileName = `進度成本最佳化報告_${new Date().toISOString().split('T')[0]}.xlsx`
   XLSX.writeFile(workbook, fileName)
 }
 

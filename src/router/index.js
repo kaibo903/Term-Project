@@ -22,7 +22,7 @@ const routes = [
     path: '/optimization',
     name: 'BiddingOptimization',
     component: BiddingOptimization,
-    meta: { title: '投標優化' }
+    meta: { title: '進度成本最佳化' }
   },
   {
     path: '/results/:resultId?',
@@ -39,7 +39,7 @@ const router = createRouter({
 
 // 路由守衛：設定頁面標題
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title ? `${to.meta.title} - 營造廠決策分析平台` : '營造廠決策分析平台'
+  document.title = to.meta.title ? `${to.meta.title} - Project Test` : 'Project Test'
   next()
 })
 

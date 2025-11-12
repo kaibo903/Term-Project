@@ -41,7 +41,11 @@ async def optimize(request: OptimizationRequest):
             for act in activities_data
         ]
         
-        # 4. 建立優化器並求解
+        # 4. 處理可選參數，將 None 轉換為預設值
+        indirect_cost = request.indirect_cost if request.indirect_cost is not None else Decimal('0.0')
+        contract_amount = request.contract_amount if request.contract_amount is not None else Decimal('0.0')
+        
+        # 5. 建立優化器並求解
         optimizer = BiddingOptimizer(activities, precedences)
         
         if request.mode == 'budget_to_duration':
@@ -49,9 +53,12 @@ async def optimize(request: OptimizationRequest):
                 raise HTTPException(status_code=400, detail="模式一需要提供預算約束")
             result = optimizer.solve_budget_to_duration(
                 budget=request.budget_constraint,
-                indirect_cost=request.indirect_cost,
+                indirect_cost=indirect_cost,
+                penalty_type=request.penalty_type,
+                penalty_amount=request.penalty_amount,
                 penalty_rate=request.penalty_rate,
-                bonus_rate=request.bonus_rate,
+                contract_amount=contract_amount,
+                contract_duration=request.contract_duration,
                 target_duration=request.target_duration
             )
         else:  # duration_to_cost
@@ -59,34 +66,40 @@ async def optimize(request: OptimizationRequest):
                 raise HTTPException(status_code=400, detail="模式二需要提供工期約束")
             result = optimizer.solve_duration_to_cost(
                 duration=request.duration_constraint,
-                indirect_cost=request.indirect_cost,
+                indirect_cost=indirect_cost,
+                penalty_type=request.penalty_type,
+                penalty_amount=request.penalty_amount,
                 penalty_rate=request.penalty_rate,
-                bonus_rate=request.bonus_rate,
+                contract_amount=contract_amount,
+                contract_duration=request.contract_duration,
                 target_duration=request.target_duration
             )
         
-        # 5. 檢查求解結果
+        # 6. 檢查求解結果
         if result['status'] != 'success':
             raise HTTPException(
                 status_code=400,
                 detail=result.get('error_message', '優化計算失敗')
             )
         
-        # 6. 儲存投標情境
+        # 7. 儲存投標情境
         scenario_data = {
             "project_id": str(request.project_id),
             "mode": request.mode,
             "budget_constraint": float(request.budget_constraint) if request.budget_constraint else None,
             "duration_constraint": request.duration_constraint,
-            "indirect_cost": float(request.indirect_cost),
-            "penalty_rate": float(request.penalty_rate),
-            "bonus_rate": float(request.bonus_rate),
+            "indirect_cost": float(indirect_cost),
+            "penalty_type": request.penalty_type,
+            "penalty_amount": float(request.penalty_amount) if request.penalty_amount else None,
+            "penalty_rate": float(request.penalty_rate) if request.penalty_rate else None,
+            "contract_amount": float(contract_amount),
+            "contract_duration": request.contract_duration,
             "target_duration": request.target_duration
         }
         scenario_response = supabase.table("bidding_scenarios").insert(scenario_data).execute()
         scenario_id = scenario_response.data[0]['id']
         
-        # 7. 儲存優化結果
+        # 8. 儲存優化結果
         result_data = {
             "scenario_id": scenario_id,
             "optimal_duration": result['optimal_duration'],
@@ -101,7 +114,7 @@ async def optimize(request: OptimizationRequest):
         result_response = supabase.table("optimization_results").insert(result_data).execute()
         result_id = result_response.data[0]['id']
         
-        # 8. 儲存作業排程
+        # 9. 儲存作業排程
         schedules_data = [
             {
                 "result_id": result_id,
@@ -116,7 +129,7 @@ async def optimize(request: OptimizationRequest):
         ]
         supabase.table("activity_schedules").insert(schedules_data).execute()
         
-        # 9. 建立回應
+        # 10. 建立回應
         schedules = [
             ActivitySchedule(
                 activity_id=UUID(s['activity_id']),
@@ -130,15 +143,18 @@ async def optimize(request: OptimizationRequest):
             for s in result['schedules']
         ]
         
-        # 10. 生成趕工計劃（如果有目標工期）
+        # 11. 生成趕工計劃（如果有目標工期）
         crashing_plans = None
         if request.target_duration:
             try:
                 plans_data = optimizer.generate_crashing_plans(
                     contract_duration=request.target_duration,
-                    indirect_cost=request.indirect_cost,
+                    indirect_cost=indirect_cost,
+                    penalty_type=request.penalty_type,
+                    penalty_amount=request.penalty_amount,
                     penalty_rate=request.penalty_rate,
-                    bonus_rate=request.bonus_rate
+                    contract_amount=contract_amount,
+                    contract_duration_for_bonus=request.contract_duration
                 )
                 
                 crashing_plans = []

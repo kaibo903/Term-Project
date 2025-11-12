@@ -19,7 +19,7 @@ export async function exportToPDF(result) {
   
   // 標題
   doc.setFontSize(18)
-  doc.text('投標最佳化決策報告', 105, yPos, { align: 'center' })
+  doc.text('進度成本最佳化決策報告', 105, yPos, { align: 'center' })
   yPos += 15
   
   // 結果摘要
@@ -84,7 +84,7 @@ export async function exportToPDF(result) {
   }
   
   // 儲存 PDF
-  const fileName = `投標優化報告_${new Date().toISOString().split('T')[0]}.pdf`
+  const fileName = `進度成本最佳化報告_${new Date().toISOString().split('T')[0]}.pdf`
   doc.save(fileName)
 }
 
