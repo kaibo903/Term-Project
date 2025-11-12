@@ -1,5 +1,11 @@
 <template>
   <div class="result-analysis">
+    <!-- 麵包屑導航 -->
+    <el-breadcrumb separator="/" class="breadcrumb">
+      <el-breadcrumb-item>首頁</el-breadcrumb-item>
+      <el-breadcrumb-item>結果分析</el-breadcrumb-item>
+    </el-breadcrumb>
+
     <el-card v-loading="loading">
       <template #header>
         <div class="card-header">
@@ -33,7 +39,7 @@
             {{ formatCurrency(result.bonus_amount) }}
           </el-descriptions-item>
           <el-descriptions-item label="總成本（含獎懲）" :span="2">
-            <strong style="font-size: 18px; color: #409eff;">
+            <strong style="font-size: 20px; color: var(--primary); font-weight: 600;">
               {{ formatCurrency(result.total_cost) }}
             </strong>
           </el-descriptions-item>
@@ -174,14 +180,74 @@ onMounted(() => {
 
 <style scoped>
 .result-analysis {
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.breadcrumb {
+  margin-bottom: 16px;
+  font-size: 14px;
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 簡約風格卡片 */
+.result-analysis :deep(.el-card) {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
+}
+
+.result-analysis :deep(.el-card__header) {
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* 描述列表樣式 */
+.result-analysis :deep(.el-descriptions) {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+}
+
+.result-analysis :deep(.el-descriptions__label) {
+  color: var(--text-secondary);
+  font-weight: 600;
+  background-color: #F8F9FA;
+}
+
+.result-analysis :deep(.el-descriptions__content) {
+  color: var(--text-primary);
+  font-weight: 400;
+}
+
+/* 表格樣式 */
+.result-analysis :deep(.el-table) {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.result-analysis :deep(.el-table th) {
+  background-color: #F8F9FA;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.result-analysis :deep(.el-table td) {
+  color: var(--text-primary);
+}
+
+.result-analysis :deep(.el-table__row:hover) {
+  background-color: #F5F7FA !important;
 }
 </style>
 

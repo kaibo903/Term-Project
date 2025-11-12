@@ -1,5 +1,10 @@
 <template>
   <div class="project-management">
+    <!-- 麵包屑導航 -->
+    <el-breadcrumb separator="/" class="breadcrumb">
+      <el-breadcrumb-item>首頁</el-breadcrumb-item>
+    </el-breadcrumb>
+
     <el-card>
       <template #header>
         <div class="card-header">
@@ -218,14 +223,69 @@ onMounted(() => {
 
 <style scoped>
 .project-management {
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.breadcrumb {
+  margin-bottom: 16px;
+  font-size: 14px;
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 簡約風格卡片 */
+.project-management :deep(.el-card) {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+}
+
+.project-management :deep(.el-card__header) {
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* 表格樣式 */
+.project-management :deep(.el-table) {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.project-management :deep(.el-table th) {
+  background-color: #F8F9FA;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.project-management :deep(.el-table td) {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.project-management :deep(.el-table__row:hover) {
+  background-color: #F5F7FA !important;
+}
+
+/* 按鈕樣式 */
+.project-management :deep(.el-button) {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.project-management :deep(.el-button--small) {
+  padding: 6px 12px;
+  font-size: 13px;
 }
 </style>
 

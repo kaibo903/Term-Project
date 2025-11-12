@@ -14,6 +14,7 @@ class OptimizationRequest(BaseModel):
     mode: str = Field(..., description="決策模式：budget_to_duration 或 duration_to_cost")
     budget_constraint: Optional[Decimal] = Field(None, description="預算約束（模式一）", gt=0)
     duration_constraint: Optional[int] = Field(None, description="工期約束（模式二）", gt=0)
+    indirect_cost: Decimal = Field(0.0, description="間接成本（每日）", ge=0)
     penalty_rate: Decimal = Field(0.0, description="逾期違約金率（每日）", ge=0)
     bonus_rate: Decimal = Field(0.0, description="趕工獎金率（每日）", ge=0)
     target_duration: Optional[int] = Field(None, description="目標工期（用於計算獎懲）", gt=0)
@@ -51,12 +52,26 @@ class ActivitySchedule(BaseModel):
     cost: Decimal
 
 
+class CrashingPlan(BaseModel):
+    """趕工計劃單一循環模型"""
+    cycle: int
+    total_duration: int
+    crashed_activities: str
+    direct_cost: Decimal
+    indirect_cost: Decimal
+    bonus: Decimal
+    penalty: Decimal
+    total_cost: Decimal
+    schedules: List[ActivitySchedule]
+
+
 class OptimizationResult(BaseModel):
     """優化結果模型"""
     scenario_id: UUID
     result_id: UUID
     optimal_duration: int
     optimal_cost: Decimal
+    indirect_cost: Decimal
     penalty_amount: Decimal
     bonus_amount: Decimal
     total_cost: Decimal
@@ -64,5 +79,6 @@ class OptimizationResult(BaseModel):
     status: str
     error_message: Optional[str]
     schedules: List[ActivitySchedule]
+    crashing_plans: Optional[List[CrashingPlan]] = None  # 趕工計劃列表
     created_at: datetime
 

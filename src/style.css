@@ -1,79 +1,165 @@
+/* 簡約側邊欄風格 - 全局樣式 */
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  /* 簡約配色系統 */
+  --sidebar-bg: #2C3E50;              /* 側邊欄背景 - 深灰藍 */
+  --sidebar-active: #3498DB;          /* 側邊欄激活色 - 藍色 */
+  --sidebar-hover: #34495E;           /* 側邊欄懸停 - 稍淺灰 */
+  --header-bg: #34495E;               /* 頂部欄背景 - 深灰 */
+  --content-bg: #F5F7FA;              /* 主內容背景 - 淺灰 */
+  --card-bg: #FFFFFF;                  /* 卡片背景 - 白色 */
+  --text-primary: #2C3E50;            /* 主要文字 - 深灰 */
+  --text-secondary: #7F8C8D;          /* 次要文字 - 中灰 */
+  --text-light: #BDC3C7;              /* 淺色文字 */
+  --text-white: #FFFFFF;               /* 白色文字 */
+  --border-color: #E1E8ED;            /* 邊框色 */
+  --border-light: #F0F3F5;            /* 淺邊框 */
+  
+  /* 強調色 */
+  --primary: #3498DB;                  /* 主色 - 藍色 */
+  --primary-hover: #2980B9;           /* 主色懸停 */
+  --success: #27AE60;                  /* 成功色 */
+  --warning: #F39C12;                  /* 警告色 */
+  --danger: #E74C3C;                   /* 危險色 */
+  
+  /* 陰影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  line-height: 1.6;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  
+  color: var(--text-primary);
+  background-color: var(--content-bg);
+  
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
-a:hover {
-  color: #535bf2;
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-.card {
-  padding: 2em;
+  color: var(--text-primary);
+  background-color: var(--content-bg);
 }
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* 簡約按鈕樣式 */
+button {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  background-color: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  padding: 8px 16px;
+}
+
+button:hover {
+  background-color: var(--primary-hover);
+}
+
+button:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* 連結樣式 */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+/* 標題樣式 */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+h1 {
+  font-size: 24px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+/* 輸入框樣式 */
+input, textarea, select {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  padding: 8px 12px;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+/* 簡約卡片樣式 */
+.content-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+/* 簡約滾動條樣式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--content-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
 }

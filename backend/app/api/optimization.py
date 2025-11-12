@@ -3,7 +3,7 @@
 """
 from fastapi import APIRouter, HTTPException
 from uuid import UUID
-from app.schemas.optimization import OptimizationRequest, OptimizationResult, ActivitySchedule
+from app.schemas.optimization import OptimizationRequest, OptimizationResult, ActivitySchedule, CrashingPlan
 from app.models.bidding_optimizer import BiddingOptimizer, Activity
 from app.utils.supabase_client import supabase
 from decimal import Decimal
@@ -49,6 +49,7 @@ async def optimize(request: OptimizationRequest):
                 raise HTTPException(status_code=400, detail="模式一需要提供預算約束")
             result = optimizer.solve_budget_to_duration(
                 budget=request.budget_constraint,
+                indirect_cost=request.indirect_cost,
                 penalty_rate=request.penalty_rate,
                 bonus_rate=request.bonus_rate,
                 target_duration=request.target_duration
@@ -58,6 +59,7 @@ async def optimize(request: OptimizationRequest):
                 raise HTTPException(status_code=400, detail="模式二需要提供工期約束")
             result = optimizer.solve_duration_to_cost(
                 duration=request.duration_constraint,
+                indirect_cost=request.indirect_cost,
                 penalty_rate=request.penalty_rate,
                 bonus_rate=request.bonus_rate,
                 target_duration=request.target_duration
@@ -76,6 +78,7 @@ async def optimize(request: OptimizationRequest):
             "mode": request.mode,
             "budget_constraint": float(request.budget_constraint) if request.budget_constraint else None,
             "duration_constraint": request.duration_constraint,
+            "indirect_cost": float(request.indirect_cost),
             "penalty_rate": float(request.penalty_rate),
             "bonus_rate": float(request.bonus_rate),
             "target_duration": request.target_duration
@@ -88,6 +91,7 @@ async def optimize(request: OptimizationRequest):
             "scenario_id": scenario_id,
             "optimal_duration": result['optimal_duration'],
             "optimal_cost": float(result['optimal_cost']),
+            "indirect_cost": float(result['indirect_cost']),
             "penalty_amount": float(result['penalty_amount']),
             "bonus_amount": float(result['bonus_amount']),
             "total_cost": float(result['total_cost']),
@@ -126,11 +130,52 @@ async def optimize(request: OptimizationRequest):
             for s in result['schedules']
         ]
         
+        # 10. 生成趕工計劃（如果有目標工期）
+        crashing_plans = None
+        if request.target_duration:
+            try:
+                plans_data = optimizer.generate_crashing_plans(
+                    contract_duration=request.target_duration,
+                    indirect_cost=request.indirect_cost,
+                    penalty_rate=request.penalty_rate,
+                    bonus_rate=request.bonus_rate
+                )
+                
+                crashing_plans = []
+                for plan_data in plans_data:
+                    plan_schedules = [
+                        ActivitySchedule(
+                            activity_id=UUID(s['activity_id']),
+                            activity_name=s['activity_name'],
+                            start_time=s['start_time'],
+                            end_time=s['end_time'],
+                            duration=s['duration'],
+                            is_crashed=s['is_crashed'],
+                            cost=s['cost']
+                        )
+                        for s in plan_data['schedules']
+                    ]
+                    crashing_plans.append(CrashingPlan(
+                        cycle=plan_data['cycle'],
+                        total_duration=plan_data['total_duration'],
+                        crashed_activities=plan_data['crashed_activities'],
+                        direct_cost=plan_data['direct_cost'],
+                        indirect_cost=plan_data['indirect_cost'],
+                        bonus=plan_data['bonus'],
+                        penalty=plan_data['penalty'],
+                        total_cost=plan_data['total_cost'],
+                        schedules=plan_schedules
+                    ))
+            except Exception as e:
+                # 如果生成趕工計劃失敗，不影響主要結果
+                print(f"生成趕工計劃失敗：{str(e)}")
+        
         return OptimizationResult(
             scenario_id=UUID(scenario_id),
             result_id=UUID(result_id),
             optimal_duration=result['optimal_duration'],
             optimal_cost=result['optimal_cost'],
+            indirect_cost=result['indirect_cost'],
             penalty_amount=result['penalty_amount'],
             bonus_amount=result['bonus_amount'],
             total_cost=result['total_cost'],
@@ -138,6 +183,7 @@ async def optimize(request: OptimizationRequest):
             status=result['status'],
             error_message=None,
             schedules=schedules,
+            crashing_plans=crashing_plans,
             created_at=datetime.now()
         )
         
@@ -182,6 +228,7 @@ async def get_optimization_result(scenario_id: UUID):
             result_id=UUID(result_id),
             optimal_duration=result_data['optimal_duration'],
             optimal_cost=Decimal(str(result_data['optimal_cost'])),
+            indirect_cost=Decimal(str(result_data.get('indirect_cost', 0))),
             penalty_amount=Decimal(str(result_data['penalty_amount'])),
             bonus_amount=Decimal(str(result_data['bonus_amount'])),
             total_cost=Decimal(str(result_data['total_cost'])),

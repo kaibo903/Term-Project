@@ -36,7 +36,7 @@ class ActivityBase(BaseModel):
 
 class ActivityCreate(ActivityBase):
     """建立作業活動請求模型"""
-    project_id: UUID = Field(..., description="專案ID")
+    # project_id 從 URL 路徑參數獲取，不需要在請求體中
     predecessor_ids: Optional[List[UUID]] = Field(default=[], description="前置作業ID列表")
 
 

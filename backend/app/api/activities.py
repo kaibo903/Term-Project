@@ -4,6 +4,7 @@
 from fastapi import APIRouter, HTTPException
 from typing import List
 from uuid import UUID
+from decimal import Decimal
 from app.schemas.activity import ActivityCreate, ActivityUpdate, ActivityResponse
 from app.utils.supabase_client import supabase
 
@@ -45,6 +46,10 @@ async def create_activity(project_id: UUID, activity: ActivityCreate):
         
         # 建立作業活動
         activity_data = activity.model_dump(exclude={'predecessor_ids'})
+        # 將 Decimal 轉換為 float 以便序列化為 JSON
+        for key in ['normal_cost', 'crash_cost']:
+            if key in activity_data and isinstance(activity_data[key], Decimal):
+                activity_data[key] = float(activity_data[key])
         activity_data['project_id'] = str(project_id)
         
         response = supabase.table("project_activities").insert(activity_data).execute()
@@ -73,6 +78,10 @@ async def update_activity(activity_id: UUID, activity: ActivityUpdate):
     try:
         # 只更新提供的欄位
         update_data = activity.model_dump(exclude_unset=True, exclude={'predecessor_ids'})
+        # 將 Decimal 轉換為 float 以便序列化為 JSON
+        for key in ['normal_cost', 'crash_cost']:
+            if key in update_data and isinstance(update_data[key], Decimal):
+                update_data[key] = float(update_data[key])
         
         if update_data:
             response = supabase.table("project_activities").update(update_data).eq("id", str(activity_id)).execute()
