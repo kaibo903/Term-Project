@@ -77,19 +77,6 @@ class ActivitySchedule(BaseModel):
     cost: Decimal
 
 
-class CrashingPlan(BaseModel):
-    """趕工計劃單一循環模型"""
-    cycle: int
-    total_duration: int
-    crashed_activities: str
-    direct_cost: Decimal
-    indirect_cost: Decimal
-    bonus: Decimal
-    penalty: Decimal
-    total_cost: Decimal
-    schedules: List[ActivitySchedule]
-
-
 class OptimizationResult(BaseModel):
     """優化結果模型"""
     scenario_id: UUID
@@ -104,6 +91,5 @@ class OptimizationResult(BaseModel):
     status: str
     error_message: Optional[str]
     schedules: List[ActivitySchedule]
-    crashing_plans: Optional[List[CrashingPlan]] = None  # 趕工計劃列表
     created_at: datetime
 

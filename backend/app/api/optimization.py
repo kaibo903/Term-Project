@@ -3,7 +3,7 @@
 """
 from fastapi import APIRouter, HTTPException
 from uuid import UUID
-from app.schemas.optimization import OptimizationRequest, OptimizationResult, ActivitySchedule, CrashingPlan
+from app.schemas.optimization import OptimizationRequest, OptimizationResult, ActivitySchedule
 from app.models.bidding_optimizer import BiddingOptimizer, Activity
 from app.utils.supabase_client import supabase
 from decimal import Decimal
@@ -143,9 +143,7 @@ async def optimize(request: OptimizationRequest):
             for s in result['schedules']
         ]
         
-        # 11. 不生成趕工計劃，一律使用最佳化結果
-        crashing_plans = None
-        
+        # 11. 返回最佳化結果
         return OptimizationResult(
             scenario_id=UUID(scenario_id),
             result_id=UUID(result_id),
@@ -159,7 +157,6 @@ async def optimize(request: OptimizationRequest):
             status=result['status'],
             error_message=None,
             schedules=schedules,
-            crashing_plans=crashing_plans,
             created_at=datetime.now()
         )
         

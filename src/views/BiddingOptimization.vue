@@ -324,42 +324,6 @@
 
           <!-- 詳細資訊（使用摺疊面板） -->
           <el-collapse v-model="activeCollapse" class="result-collapse">
-            <!-- 趕工計劃 -->
-            <el-collapse-item 
-              v-if="optimizationResult.crashing_plans && optimizationResult.crashing_plans.length > 0" 
-              name="crashing-plans"
-              title="趕工計劃"
-            >
-              <div class="table-container-new">
-                <el-table :data="optimizationResult.crashing_plans" class="data-table-new compact-table" border size="small">
-                  <el-table-column prop="cycle" label="循環" width="60" align="center" />
-                  <el-table-column prop="total_duration" label="工期" width="60" align="center">
-                    <template #default="{ row }">{{ row.total_duration }}天</template>
-                  </el-table-column>
-                  <el-table-column prop="crashed_activities" label="壓縮作業" min-width="120">
-                    <template #default="{ row }">{{ row.crashed_activities || '--' }}</template>
-                  </el-table-column>
-                  <el-table-column prop="direct_cost" label="直接成本" width="100" align="right">
-                    <template #default="{ row }">{{ formatCurrency(row.direct_cost) }}</template>
-                  </el-table-column>
-                  <el-table-column prop="indirect_cost" label="間接成本" width="100" align="right">
-                    <template #default="{ row }">{{ formatCurrency(row.indirect_cost) }}</template>
-                  </el-table-column>
-                  <el-table-column prop="bonus" label="獎金" width="100" align="right">
-                    <template #default="{ row }">{{ formatCurrency(row.bonus) }}</template>
-                  </el-table-column>
-                  <el-table-column prop="penalty" label="罰金" width="100" align="right">
-                    <template #default="{ row }">{{ formatCurrency(row.penalty) }}</template>
-                  </el-table-column>
-                  <el-table-column prop="total_cost" label="總成本" width="100" align="right">
-                    <template #default="{ row }">
-                      <strong>{{ formatCurrency(row.total_cost) }}</strong>
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </div>
-            </el-collapse-item>
-
             <!-- 詳細作業排程 -->
             <el-collapse-item 
               v-if="optimizationResult.schedules && optimizationResult.schedules.length > 0" 
