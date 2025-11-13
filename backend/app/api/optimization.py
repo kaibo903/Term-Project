@@ -143,48 +143,8 @@ async def optimize(request: OptimizationRequest):
             for s in result['schedules']
         ]
         
-        # 11. 生成趕工計劃（如果有目標工期）
+        # 11. 不生成趕工計劃，一律使用最佳化結果
         crashing_plans = None
-        if request.target_duration:
-            try:
-                plans_data = optimizer.generate_crashing_plans(
-                    contract_duration=request.target_duration,
-                    indirect_cost=indirect_cost,
-                    penalty_type=request.penalty_type,
-                    penalty_amount=request.penalty_amount,
-                    penalty_rate=request.penalty_rate,
-                    contract_amount=contract_amount,
-                    contract_duration_for_bonus=request.contract_duration
-                )
-                
-                crashing_plans = []
-                for plan_data in plans_data:
-                    plan_schedules = [
-                        ActivitySchedule(
-                            activity_id=UUID(s['activity_id']),
-                            activity_name=s['activity_name'],
-                            start_time=s['start_time'],
-                            end_time=s['end_time'],
-                            duration=s['duration'],
-                            is_crashed=s['is_crashed'],
-                            cost=s['cost']
-                        )
-                        for s in plan_data['schedules']
-                    ]
-                    crashing_plans.append(CrashingPlan(
-                        cycle=plan_data['cycle'],
-                        total_duration=plan_data['total_duration'],
-                        crashed_activities=plan_data['crashed_activities'],
-                        direct_cost=plan_data['direct_cost'],
-                        indirect_cost=plan_data['indirect_cost'],
-                        bonus=plan_data['bonus'],
-                        penalty=plan_data['penalty'],
-                        total_cost=plan_data['total_cost'],
-                        schedules=plan_schedules
-                    ))
-            except Exception as e:
-                # 如果生成趕工計劃失敗，不影響主要結果
-                print(f"生成趕工計劃失敗：{str(e)}")
         
         return OptimizationResult(
             scenario_id=UUID(scenario_id),
