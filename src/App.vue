@@ -3,9 +3,15 @@
     <!-- 頂部導航欄 -->
     <header class="app-header">
       <div class="header-left">
+        <el-button
+          text
+          class="collapse-btn"
+          @click="toggleSidebar"
+          :icon="isCollapsed ? Expand : Fold"
+        />
         <div class="logo" @click="goToProjects">
           <el-icon class="logo-icon"><TrendCharts /></el-icon>
-          <span class="logo-text">Project Test</span>
+          <span class="logo-text" v-show="!isCollapsed">Project Test</span>
         </div>
       </div>
       <div class="header-right">
@@ -18,24 +24,35 @@
     </header>
 
     <div class="app-body">
+      <!-- 手機版遮罩層 -->
+      <div
+        v-if="isMobile && !isCollapsed"
+        class="sidebar-overlay"
+        @click="toggleSidebar"
+      ></div>
+
       <!-- 左側邊欄 -->
-      <aside class="app-sidebar">
+      <aside class="app-sidebar" :class="{ collapsed: isCollapsed }">
         <nav class="sidebar-nav">
           <router-link
             to="/projects"
             class="nav-item"
             :class="{ active: activeMenu === '/projects' || activeMenu.startsWith('/projects') }"
+            :title="isCollapsed ? '專案管理' : ''"
+            @click="handleNavClick"
           >
             <el-icon><House /></el-icon>
-            <span>專案管理</span>
+            <span class="nav-text">專案管理</span>
           </router-link>
           <router-link
             to="/optimization"
             class="nav-item"
             :class="{ active: activeMenu === '/optimization' }"
+            :title="isCollapsed ? '進度成本最佳化' : ''"
+            @click="handleNavClick"
           >
             <el-icon><TrendCharts /></el-icon>
-            <span>進度成本最佳化</span>
+            <span class="nav-text">進度成本最佳化</span>
           </router-link>
         </nav>
       </aside>
@@ -49,12 +66,60 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { TrendCharts, User, ArrowDown, House } from '@element-plus/icons-vue'
+import { TrendCharts, User, ArrowDown, House, Fold, Expand } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
+
+// 側邊欄收放狀態
+const isCollapsed = ref(false)
+
+// 手機版檢測
+const isMobile = ref(false)
+
+const updateIsMobile = () => {
+  if (typeof window === 'undefined') return
+  isMobile.value = window.innerWidth <= 768
+  // 手機版預設收起側邊欄
+  if (isMobile.value) {
+    isCollapsed.value = true
+  }
+}
+
+// 從 localStorage 讀取收放狀態
+onMounted(() => {
+  updateIsMobile()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', updateIsMobile)
+    const saved = localStorage.getItem('sidebarCollapsed')
+    if (saved !== null && !isMobile.value) {
+      isCollapsed.value = saved === 'true'
+    }
+  }
+})
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', updateIsMobile)
+  }
+})
+
+// 切換側邊欄收放
+const toggleSidebar = () => {
+  isCollapsed.value = !isCollapsed.value
+  if (!isMobile.value) {
+    localStorage.setItem('sidebarCollapsed', isCollapsed.value.toString())
+  }
+}
+
+// 處理導航點擊（手機版點擊後自動收起）
+const handleNavClick = () => {
+  if (isMobile.value) {
+    isCollapsed.value = true
+  }
+}
 
 // 計算當前啟用的選單項
 const activeMenu = computed(() => {
@@ -95,6 +160,27 @@ const goToProjects = () => {
 .header-left {
   display: flex;
   align-items: center;
+  gap: 16px;
+}
+
+.collapse-btn {
+  padding: 8px !important;
+  min-width: 32px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  color: var(--text-primary) !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.collapse-btn:hover {
+  background-color: var(--content-bg) !important;
+  border-color: var(--border-color) !important;
 }
 
 .logo {
@@ -167,9 +253,19 @@ const goToProjects = () => {
   overflow-y: auto;
   overflow-x: hidden;
   border-right: 1px solid var(--border-color);
+  transition: width 0.3s ease;
+}
+
+.app-sidebar.collapsed {
+  width: 64px;
 }
 
 .sidebar-nav {
+  padding: 32px 0;
+  transition: padding 0.3s ease;
+}
+
+.app-sidebar.collapsed .sidebar-nav {
   padding: 32px 0;
 }
 
@@ -180,6 +276,12 @@ const goToProjects = () => {
   color: var(--text-secondary);
   text-transform: none;
   letter-spacing: 0.1em;
+  transition: opacity 0.3s ease;
+}
+
+.app-sidebar.collapsed .nav-title {
+  opacity: 0;
+  padding: 0 16px 20px;
 }
 
 .nav-item {
@@ -194,6 +296,13 @@ const goToProjects = () => {
   transition: all 0.2s ease;
   border-left: 2px solid transparent;
   border-right: none;
+  position: relative;
+  white-space: nowrap;
+}
+
+.app-sidebar.collapsed .nav-item {
+  padding: 14px 16px;
+  justify-content: center;
 }
 
 .nav-item:hover {
@@ -210,6 +319,18 @@ const goToProjects = () => {
 
 .nav-item .el-icon {
   font-size: 18px;
+  flex-shrink: 0;
+}
+
+.nav-text {
+  transition: opacity 0.3s ease;
+  overflow: hidden;
+}
+
+.app-sidebar.collapsed .nav-text {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
 }
 
 /* 主要內容區域 - 無印風格 */
@@ -220,6 +341,59 @@ const goToProjects = () => {
   background-color: var(--content-bg);
   padding: 40px;
   height: calc(100vh - 64px);
+  transition: margin-left 0.3s ease;
+}
+
+/* 手機版遮罩層 */
+.sidebar-overlay {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  transition: opacity 0.3s ease;
+}
+
+/* 手機版響應式 */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0 16px;
+  }
+
+  .logo-text {
+    display: none;
+  }
+
+  .app-sidebar {
+    position: fixed;
+    left: 0;
+    top: 64px;
+    height: calc(100vh - 64px);
+    z-index: 999;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .app-sidebar:not(.collapsed) {
+    transform: translateX(0);
+  }
+
+  .app-sidebar.collapsed {
+    width: 260px;
+    transform: translateX(-100%);
+  }
+
+  .app-main {
+    padding: 16px;
+    margin-left: 0;
+  }
+
+  .user-info span {
+    display: none;
+  }
 }
 </style>
 
