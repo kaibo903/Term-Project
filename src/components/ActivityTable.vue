@@ -225,7 +225,8 @@
             </template>
           </div>
         </template>
-        </el-table>
+      </el-table-column>
+      </el-table>
       </div>
 
       <div v-else class="mobile-activity-list">
