@@ -53,6 +53,7 @@
 | 功能 | 前端檔案 | 後端檔案 | 說明 |
 |------|---------|---------|------|
 | 作業列表 | `src/components/ActivityTable.vue` (loadActivities) | `backend/app/api/activities.py` (get_activities) | 取得專案的所有作業 |
+| 作業列表欄位顯示 | `src/components/ActivityTable.vue` (table columns) | - | 顯示正常/趕工工期與成本欄位 |
 | 建立作業 | `src/components/ActivityTable.vue` (saveActivity) | `backend/app/api/activities.py` (create_activity) | 建立新作業 |
 | 更新作業 | `src/components/ActivityTable.vue` (editActivity) | `backend/app/api/activities.py` (update_activity) | 更新作業資訊 |
 | 刪除作業 | `src/components/ActivityTable.vue` (deleteActivity) | `backend/app/api/activities.py` (delete_activity) | 刪除作業 |

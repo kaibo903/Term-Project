@@ -16,14 +16,20 @@
       </div>
       
       <el-table 
-      :data="displayActivities" 
-      v-loading="loading" 
-      stripe 
-      border
-      class="activity-data-table"
-      :empty-text="emptyText"
-    >
-      <el-table-column prop="name" label="作業名稱" width="120" min-width="120">
+        :data="displayActivities" 
+        v-loading="loading" 
+        stripe 
+        border
+        class="activity-data-table"
+        :empty-text="emptyText"
+        style="width: 100%;"
+      >
+      <el-table-column prop="name" :label="''" min-width="200" align="center">
+        <template #header>
+          <div class="header-label">
+            <span class="main-text">作業名稱</span>
+          </div>
+        </template>
         <template #default="{ row }">
           <el-input
             v-if="row.isEditing"
@@ -37,7 +43,13 @@
           <span v-else class="cell-text">{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="normal_duration" label="工期" width="80" align="center">
+      <el-table-column prop="normal_duration" :label="''" min-width="140" align="center">
+        <template #header>
+          <div class="header-label">
+            <span class="main-text">正常工期</span>
+            <span class="sub-text">（天）</span>
+          </div>
+        </template>
         <template #default="{ row }">
           <el-input-number
             v-if="row.isEditing"
@@ -52,17 +64,76 @@
           <span v-else class="cell-text">{{ row.normal_duration }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="開始時間" width="100" align="center">
+      <el-table-column prop="crash_duration" :label="''" min-width="140" align="center">
+        <template #header>
+          <div class="header-label">
+            <span class="main-text">趕工工期</span>
+            <span class="sub-text">（天）</span>
+          </div>
+        </template>
         <template #default="{ row }">
-          <span class="cell-text empty-text">-</span>
+          <el-input-number
+            v-if="row.isEditing"
+            v-model="row.crash_duration"
+            :min="1"
+            :precision="0"
+            class="inline-input-number"
+            size="small"
+            :controls="false"
+            @keyup.enter="handleEnterKey(row)"
+          />
+          <span v-else class="cell-text">{{ row.crash_duration }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="結束時間" width="100" align="center">
+      <el-table-column prop="normal_cost" :label="''" min-width="160" align="center">
+        <template #header>
+          <div class="header-label">
+            <span class="main-text">正常成本</span>
+            <span class="sub-text">（NT$）</span>
+          </div>
+        </template>
         <template #default="{ row }">
-          <span class="cell-text empty-text">-</span>
+          <el-input-number
+            v-if="row.isEditing"
+            v-model="row.normal_cost"
+            :min="0"
+            :precision="0"
+            class="inline-input-number"
+            size="small"
+            :controls="false"
+            @keyup.enter="handleEnterKey(row)"
+          />
+          <span v-else class="cell-text">{{ formatCurrency(row.normal_cost) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="前置作業" width="120" align="center">
+      <el-table-column prop="crash_cost" :label="''" min-width="160" align="center">
+        <template #header>
+          <div class="header-label">
+            <span class="main-text">趕工成本</span>
+            <span class="sub-text">（NT$）</span>
+          </div>
+        </template>
+        <template #default="{ row }">
+          <el-input-number
+            v-if="row.isEditing"
+            v-model="row.crash_cost"
+            :min="0"
+            :precision="0"
+            class="inline-input-number"
+            size="small"
+            :controls="false"
+            @keyup.enter="handleEnterKey(row)"
+          />
+          <span v-else class="cell-text">{{ formatCurrency(row.crash_cost) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="''" min-width="160" align="center">
+        <template #header>
+          <div class="header-label">
+            <span class="main-text">前置作業</span>
+            <span class="sub-text">（可多選）</span>
+          </div>
+        </template>
         <template #default="{ row }">
           <el-select
             v-if="row.isEditing"
@@ -95,29 +166,23 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="後續作業" width="120" align="center">
+      <el-table-column :label="''" min-width="140" align="center">
+        <template #header>
+          <div class="header-label">
+            <span class="main-text">後續作業</span>
+            <span class="sub-text">（系統顯示）</span>
+          </div>
+        </template>
         <template #default="{ row }">
           <span class="cell-text empty-text">無</span>
         </template>
       </el-table-column>
-      <el-table-column prop="normal_cost" label="成本" width="120" align="right">
-        <template #default="{ row }">
-          <el-input-number
-            v-if="row.isEditing"
-            v-model="row.normal_cost"
-            :min="0"
-            :precision="0"
-            class="inline-input-number"
-            size="small"
-            :controls="false"
-            @keyup.enter="handleEnterKey(row)"
-          >
-            <template #prefix>NT$</template>
-          </el-input-number>
-          <span v-else class="cell-text">{{ formatCurrency(row.normal_cost) }}</span>
+      <el-table-column :label="''" min-width="120" align="center">
+        <template #header>
+          <div class="header-label">
+            <span class="main-text">操作</span>
+          </div>
         </template>
-      </el-table-column>
-      <el-table-column label="操作" width="120" fixed="right" align="center">
         <template #default="{ row }">
           <div class="action-buttons-inline">
             <template v-if="row.isEditing">
@@ -216,9 +281,7 @@
               :precision="2"
               class="form-input-number"
               placeholder="請輸入正常成本"
-            >
-              <template #prefix>NT$</template>
-            </el-input-number>
+            />
           </el-form-item>
         </div>
 
@@ -240,9 +303,7 @@
               :precision="2"
               class="form-input-number"
               placeholder="請輸入趕工成本"
-            >
-              <template #prefix>NT$</template>
-            </el-input-number>
+            />
           </el-form-item>
         </div>
 
@@ -311,10 +372,10 @@ const displayActivities = computed(() => {
 const activityForm = ref({
   name: '',
   description: '',
-  normal_duration: 1,
-  normal_cost: 0,
-  crash_duration: 1,
-  crash_cost: 0,
+  normal_duration: null,
+  normal_cost: null,
+  crash_duration: null,
+  crash_cost: null,
   predecessor_ids: []
 })
 
@@ -413,10 +474,10 @@ const addNewRow = () => {
     id: null,
     name: '',
     description: '',
-    normal_duration: 1,
-    normal_cost: 0,
-    crash_duration: 1,
-    crash_cost: 0,
+    normal_duration: null,
+    normal_cost: null,
+    crash_duration: null,
+    crash_cost: null,
     predecessor_ids: [],
     isEditing: true,
     isNew: true,
@@ -579,10 +640,10 @@ const resetForm = () => {
   activityForm.value = {
     name: '',
     description: '',
-    normal_duration: 1,
-    normal_cost: 0,
-    crash_duration: 1,
-    crash_cost: 0,
+    normal_duration: null,
+    normal_cost: null,
+    crash_duration: null,
+    crash_cost: null,
     predecessor_ids: []
   }
   formRef.value?.resetFields()
@@ -706,14 +767,29 @@ onMounted(() => {
 }
 
 /* 內聯輸入框樣式 - 現代專業風格 */
+.activity-table :deep(.inline-input),
+.activity-table :deep(.inline-input-number),
+.activity-table :deep(.inline-select) {
+  width: 100%;
+  display: block;
+}
+
+.activity-table :deep(.inline-input .el-input),
+.activity-table :deep(.inline-select .el-select),
+.activity-table :deep(.inline-input-number.el-input-number) {
+  width: 100% !important;
+}
+
 .activity-table :deep(.inline-input .el-input__wrapper),
 .activity-table :deep(.inline-input-number .el-input__wrapper),
 .activity-table :deep(.inline-select .el-input__wrapper) {
-  border-radius: 6px;
-  border: 1px solid #E5E7EB;
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid #D1D5DB;
   box-shadow: none;
   background-color: #FFFFFF;
   transition: all 0.2s ease;
+  padding: 0 20px;
 }
 
 .activity-table :deep(.inline-input .el-input__wrapper:hover),
@@ -727,20 +803,43 @@ onMounted(() => {
 .activity-table :deep(.inline-input-number .el-input__wrapper.is-focus),
 .activity-table :deep(.inline-select .el-input__wrapper.is-focus) {
   border-color: #3B82F6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 1px 0 rgba(59, 130, 246, 0.3);
   background-color: #FFFFFF;
 }
 
 .activity-table :deep(.inline-input-number .el-input__inner) {
   text-align: inherit;
+  min-height: 40px;
+  line-height: 40px;
+  font-size: 18px;
+  border: none;
 }
 
-.activity-table :deep(.inline-input-number) {
+.activity-table :deep(.inline-input .el-input__inner),
+.activity-table :deep(.inline-select .el-input__inner) {
+  min-height: 40px;
+  line-height: 40px;
+  font-size: 18px;
+  border: none;
+}
+
+.activity-table :deep(.el-input-number__decrease),
+.activity-table :deep(.el-input-number__increase) {
+  width: 32px;
+  font-size: 16px;
+}
+
+.activity-table :deep(.inline-input-number .el-input__wrapper),
+.activity-table :deep(.inline-input .el-input__wrapper),
+.activity-table :deep(.inline-select .el-input__wrapper) {
+  min-height: 52px;
+  padding: 0 20px;
   width: 100%;
 }
 
-.activity-table :deep(.inline-select) {
-  width: 100%;
+.activity-table :deep(.inline-input .el-input__inner::placeholder),
+.activity-table :deep(.inline-select .el-input__inner::placeholder) {
+  font-size: 18px;
 }
 
 .action-buttons-inline {
@@ -844,6 +943,7 @@ onMounted(() => {
   border-radius: 0;
   border: none;
   overflow: hidden;
+  width: 100%;
 }
 
 .activity-table :deep(.activity-data-table .el-table__header-wrapper) {
@@ -856,7 +956,7 @@ onMounted(() => {
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-md);
   border-bottom: 2px solid var(--border-color);
-  padding: var(--spacing-lg) var(--spacing-md);
+  padding: 18px 16px;
   letter-spacing: 0;
   text-align: center;
   white-space: nowrap;
@@ -867,11 +967,32 @@ onMounted(() => {
   padding-left: var(--spacing-xl);
 }
 
+.header-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  line-height: 1.2;
+}
+
+.header-label .main-text {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+.header-label .sub-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+}
+
 .activity-table :deep(.activity-data-table td) {
   color: var(--text-primary);
   font-size: var(--font-size-md);
   border-bottom: 1px solid var(--border-light);
-  padding: var(--spacing-lg) var(--spacing-md);
+  padding: 18px 16px;
   line-height: 1.6;
   background-color: var(--card-bg);
   text-align: center;
