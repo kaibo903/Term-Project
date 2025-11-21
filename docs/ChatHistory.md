@@ -224,6 +224,16 @@
 **理由**：
 - 使用者需要在不開啟編輯視窗的情況下即時比對正常與趕工參數，縮短資料驗證時間
 
+### 2025-11-22
+
+**行動版優化**：
+- `src/components/ActivityTable.vue` 新增手機偵測與卡片式佈局，所有輸入欄位支援全寬操作
+- `src/views/ProjectManagement.vue` 新增專案卡片版、手機尺寸偵測與樣式
+- `docs/PRD.md`、`docs/UserManual.md`、`docs/FeatureCodeMap.md` 更新行動支援描述
+
+**理由**：
+- 確保使用者在手機上也能管理專案與作業、閱讀欄位資訊並完成編輯或刪除動作
+
 ---
 
 **版本**：1.0.0  

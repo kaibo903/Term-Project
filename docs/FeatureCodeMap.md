@@ -34,6 +34,7 @@
 | 功能 | 前端檔案 | 後端檔案 | 說明 |
 |------|---------|---------|------|
 | 專案列表 | `src/views/ProjectManagement.vue` | `backend/app/api/projects.py` (get_projects) | 取得所有專案 |
+| 專案行動版卡片 | `src/views/ProjectManagement.vue` (project-card-list) | - | 手機螢幕顯示卡片式專案資訊 |
 | 建立專案 | `src/views/ProjectManagement.vue` (saveProject) | `backend/app/api/projects.py` (create_project) | 建立新專案 |
 | 更新專案 | `src/views/ProjectManagement.vue` (editProject) | `backend/app/api/projects.py` (update_project) | 更新專案資訊 |
 | 刪除專案 | `src/views/ProjectManagement.vue` (deleteProject) | `backend/app/api/projects.py` (delete_project) | 刪除專案 |
@@ -53,6 +54,7 @@
 | 功能 | 前端檔案 | 後端檔案 | 說明 |
 |------|---------|---------|------|
 | 作業列表 | `src/components/ActivityTable.vue` (loadActivities) | `backend/app/api/activities.py` (get_activities) | 取得專案的所有作業 |
+| 手機版作業卡片 | `src/components/ActivityTable.vue` (mobile-activity-list) | - | 小螢幕改用卡片式呈現並支援編輯 |
 | 作業列表欄位顯示 | `src/components/ActivityTable.vue` (table columns) | - | 顯示正常/趕工工期與成本欄位 |
 | 建立作業 | `src/components/ActivityTable.vue` (saveActivity) | `backend/app/api/activities.py` (create_activity) | 建立新作業 |
 | 更新作業 | `src/components/ActivityTable.vue` (editActivity) | `backend/app/api/activities.py` (update_activity) | 更新作業資訊 |

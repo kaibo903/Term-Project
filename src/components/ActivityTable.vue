@@ -15,15 +15,16 @@
         </button>
       </div>
       
-      <el-table 
-        :data="displayActivities" 
-        v-loading="loading" 
-        stripe 
-        border
-        class="activity-data-table"
-        :empty-text="emptyText"
-        style="width: 100%;"
-      >
+      <div v-if="!isMobile">
+        <el-table 
+          :data="displayActivities" 
+          v-loading="loading" 
+          stripe 
+          border
+          class="activity-data-table"
+          :empty-text="emptyText"
+          style="width: 100%;"
+        >
       <el-table-column prop="name" :label="''" min-width="200" align="center">
         <template #header>
           <div class="header-label">
@@ -224,8 +225,177 @@
             </template>
           </div>
         </template>
-      </el-table-column>
-      </el-table>
+        </el-table>
+      </div>
+
+      <div v-else class="mobile-activity-list">
+        <template v-if="displayActivities.length">
+          <div
+            v-for="(row, index) in displayActivities"
+            :key="row.id || index"
+            class="activity-card"
+          >
+            <div class="card-header">
+              <div class="card-title">
+                <el-input
+                  v-if="row.isEditing"
+                  v-model="row.name"
+                  placeholder="請輸入作業名稱"
+                  class="inline-input"
+                  size="small"
+                  @keyup.enter="handleEnterKey(row)"
+                />
+                <span v-else>{{ row.name || '未命名作業' }}</span>
+              </div>
+              <div class="card-actions-inline">
+                <template v-if="row.isEditing">
+                  <el-button 
+                    size="small" 
+                    type="primary" 
+                    @click="saveInlineActivity(row)" 
+                    :icon="Check" 
+                    text 
+                    class="action-btn icon-btn save-btn"
+                    :loading="saving && row === editingRow"
+                  />
+                  <el-button 
+                    size="small" 
+                    @click="cancelInlineEdit(row)" 
+                    :icon="Close" 
+                    text 
+                    class="action-btn icon-btn cancel-btn"
+                    :disabled="saving"
+                  />
+                </template>
+                <template v-else>
+                  <el-button 
+                    size="small" 
+                    type="primary" 
+                    @click="editActivity(row)" 
+                    :icon="Edit" 
+                    text 
+                    class="action-btn icon-btn"
+                  />
+                  <el-button 
+                    size="small" 
+                    type="danger" 
+                    @click="deleteActivity(row)" 
+                    :icon="Delete" 
+                    text 
+                    class="action-btn icon-btn"
+                  />
+                </template>
+              </div>
+            </div>
+
+            <div class="card-field">
+              <span class="field-label">正常工期（天）</span>
+              <div class="field-value">
+                <el-input-number
+                  v-if="row.isEditing"
+                  v-model="row.normal_duration"
+                  :min="1"
+                  :precision="0"
+                  class="inline-input-number"
+                  size="small"
+                  :controls="false"
+                />
+                <span v-else>{{ row.normal_duration ?? '—' }}</span>
+              </div>
+            </div>
+
+            <div class="card-field">
+              <span class="field-label">趕工工期（天）</span>
+              <div class="field-value">
+                <el-input-number
+                  v-if="row.isEditing"
+                  v-model="row.crash_duration"
+                  :min="1"
+                  :precision="0"
+                  class="inline-input-number"
+                  size="small"
+                  :controls="false"
+                />
+                <span v-else>{{ row.crash_duration ?? '—' }}</span>
+              </div>
+            </div>
+
+            <div class="card-field">
+              <span class="field-label">正常成本（NT$）</span>
+              <div class="field-value">
+                <el-input-number
+                  v-if="row.isEditing"
+                  v-model="row.normal_cost"
+                  :min="0"
+                  :precision="0"
+                  class="inline-input-number"
+                  size="small"
+                  :controls="false"
+                />
+                <span v-else>{{ row.normal_cost != null ? formatCurrency(row.normal_cost) : '—' }}</span>
+              </div>
+            </div>
+
+            <div class="card-field">
+              <span class="field-label">趕工成本（NT$）</span>
+              <div class="field-value">
+                <el-input-number
+                  v-if="row.isEditing"
+                  v-model="row.crash_cost"
+                  :min="0"
+                  :precision="0"
+                  class="inline-input-number"
+                  size="small"
+                  :controls="false"
+                />
+                <span v-else>{{ row.crash_cost != null ? formatCurrency(row.crash_cost) : '—' }}</span>
+              </div>
+            </div>
+
+            <div class="card-field">
+              <span class="field-label">前置作業</span>
+              <div class="field-value">
+                <el-select
+                  v-if="row.isEditing"
+                  v-model="row.predecessor_ids"
+                  multiple
+                  placeholder="請選擇"
+                  class="inline-select"
+                  size="small"
+                >
+                  <el-option
+                    v-for="act in availablePredecessorsForEdit(row)"
+                    :key="act.id"
+                    :label="act.name"
+                    :value="act.id"
+                  />
+                </el-select>
+                <div v-else class="predecessor-tags">
+                  <template v-if="getPredecessors(row.id) && getPredecessors(row.id).length > 0">
+                    <el-tag
+                      v-for="pred in getPredecessors(row.id)"
+                      :key="pred.id"
+                      size="small"
+                      class="predecessor-tag"
+                    >
+                      {{ pred.name }}
+                    </el-tag>
+                  </template>
+                  <span v-else class="empty-text">無</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-field">
+              <span class="field-label">後續作業</span>
+              <div class="field-value">
+                <span class="empty-text">無</span>
+              </div>
+            </div>
+          </div>
+        </template>
+        <el-empty v-else description="暫無作業資料" />
+      </div>
     </div>
 
     <!-- 建立/編輯作業對話框 -->
@@ -340,7 +510,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Edit, Delete, Check, Close } from '@element-plus/icons-vue'
 import { activityAPI } from '../services/api'
@@ -358,6 +528,7 @@ const activities = ref([])
 const loading = ref(false)
 const saving = ref(false)
 const showCreateDialog = ref(false)
+const isMobile = ref(false)
 const editingActivity = ref(null)
 const formRef = ref(null)
 const isAddingNew = ref(false)
@@ -663,9 +834,34 @@ const handleDialogClose = () => {
   resetForm()
 }
 
+const updateIsMobile = () => {
+  if (typeof window === 'undefined') return
+  isMobile.value = window.innerWidth <= 768
+}
+
 onMounted(() => {
+  updateIsMobile()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', updateIsMobile)
+  }
   loadActivities()
 })
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', updateIsMobile)
+  }
+})
+
+watch(
+  () => props.projectId,
+  (newId, oldId) => {
+    if (newId && newId !== oldId) {
+      resetForm()
+      loadActivities()
+    }
+  }
+)
 </script>
 
 <style scoped>
@@ -1023,6 +1219,68 @@ onMounted(() => {
   font-size: var(--font-size-md);
 }
 
+.card-actions-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-wrap: nowrap;
+}
+
+.mobile-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.activity-card {
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 16px;
+  background-color: var(--card-bg);
+  box-shadow: var(--shadow);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.card-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.field-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.field-value {
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.mobile-activity-list :deep(.inline-select .el-select__wrapper) {
+  width: 100%;
+}
+
+.mobile-activity-list :deep(.inline-input input),
+.mobile-activity-list :deep(.inline-input-number input) {
+  font-size: 16px;
+}
+
 .cell-text {
   display: inline-block;
   font-size: var(--font-size-base);
@@ -1286,6 +1544,30 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .activity-table {
+    padding: 16px;
+    min-height: auto;
+  }
+
+  .table-container {
+    border: none;
+    border-radius: 12px;
+    box-shadow: none;
+  }
+
+  .table-header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .add-activity-btn-header {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .activity-table :deep(.cancel-btn) {

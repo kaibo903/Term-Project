@@ -75,7 +75,7 @@
                     :precision="0"
                     :step="10000"
                     class="number-input"
-                    placeholder="請輸入預算上限"
+                    placeholder="上限"
                     :controls="false"
                   >
                     <template #prefix>NT$</template>

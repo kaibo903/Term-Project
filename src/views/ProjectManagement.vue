@@ -17,48 +17,96 @@
       </template>
 
       <!-- 專案列表 -->
-      <el-table 
-        :data="projects" 
-        v-loading="loading" 
-        stripe
-        :empty-text="emptyText"
-        class="project-table"
-      >
-        <el-table-column prop="name" label="專案名稱" width="220" />
-        <el-table-column prop="description" label="描述" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="status" label="狀態" width="120">
-          <template #default="{ row }">
-            <el-tag 
-              :type="getStatusType(row.status)" 
-              :class="`status-tag status-${row.status}`"
-              effect="plain"
-            >
-              {{ getStatusText(row.status) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="created_at" label="建立時間" width="200">
-          <template #default="{ row }">
-            <span style="white-space: nowrap;">{{ formatDate(row.created_at) }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="240" fixed="right">
-          <template #default="{ row }">
-            <div class="action-buttons">
-              <el-button 
-                size="small" 
-                @click="viewActivities(row)" 
-                class="action-btn manage-btn"
-                plain
+      <template v-if="!isMobile">
+        <el-table 
+          :data="projects" 
+          v-loading="loading" 
+          stripe
+          :empty-text="emptyText"
+          class="project-table"
+        >
+          <el-table-column prop="name" label="專案名稱" width="220" />
+          <el-table-column prop="description" label="描述" min-width="120" show-overflow-tooltip />
+          <el-table-column prop="status" label="狀態" width="120">
+            <template #default="{ row }">
+              <el-tag 
+                :type="getStatusType(row.status)" 
+                :class="`status-tag status-${row.status}`"
+                effect="plain"
               >
-                管理作業
-              </el-button>
-              <el-button size="small" type="primary" @click="editProject(row)" :icon="Edit" text class="action-btn icon-btn" />
-              <el-button size="small" type="danger" @click="deleteProject(row)" :icon="Delete" text class="action-btn icon-btn" />
+                {{ getStatusText(row.status) }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="created_at" label="建立時間" width="200">
+            <template #default="{ row }">
+              <span style="white-space: nowrap;">{{ formatDate(row.created_at) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="240" fixed="right">
+            <template #default="{ row }">
+              <div class="action-buttons">
+                <el-button 
+                  size="small" 
+                  @click="viewActivities(row)" 
+                  class="action-btn manage-btn"
+                  plain
+                >
+                  管理作業
+                </el-button>
+                <el-button size="small" type="primary" @click="editProject(row)" :icon="Edit" text class="action-btn icon-btn" />
+                <el-button size="small" type="danger" @click="deleteProject(row)" :icon="Delete" text class="action-btn icon-btn" />
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </template>
+      <template v-else>
+        <div class="project-card-list">
+          <template v-if="projects.length">
+            <div 
+              v-for="project in projects" 
+              :key="project.id" 
+              class="project-card"
+            >
+              <div class="project-card-header">
+                <div>
+                  <div class="card-title">{{ project.name }}</div>
+                  <div class="card-subtitle">{{ formatDate(project.created_at) }}</div>
+                </div>
+                <el-tag 
+                  :type="getStatusType(project.status)" 
+                  :class="`status-tag status-${project.status}`"
+                  effect="plain"
+                >
+                  {{ getStatusText(project.status) }}
+                </el-tag>
+              </div>
+              <div class="project-card-body">
+                <div class="card-field">
+                  <span class="field-label">描述</span>
+                  <span class="field-value">{{ project.description || '—' }}</span>
+                </div>
+              </div>
+              <div class="project-card-actions">
+                <el-button 
+                  size="small" 
+                  @click="viewActivities(project)" 
+                  class="action-btn manage-btn"
+                  plain
+                >
+                  管理作業
+                </el-button>
+                <div class="icon-action-group">
+                  <el-button size="small" type="primary" @click="editProject(project)" :icon="Edit" text class="action-btn icon-btn" />
+                  <el-button size="small" type="danger" @click="deleteProject(project)" :icon="Delete" text class="action-btn icon-btn" />
+                </div>
+              </div>
             </div>
           </template>
-        </el-table-column>
-      </el-table>
+          <el-empty v-else :description="emptyText" />
+        </div>
+      </template>
     </el-card>
 
     <!-- 建立/編輯專案對話框 -->
@@ -110,7 +158,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 import { projectAPI } from '../services/api'
@@ -123,6 +171,7 @@ const showCreateDialog = ref(false)
 const showActivityDialog = ref(false)
 const editingProject = ref(null)
 const currentProject = ref(null)
+const isMobile = ref(false)
 
 const emptyText = '暫無專案資料，請點擊「新增專案」建立第一個專案'
 
@@ -261,8 +310,23 @@ const handleDialogClose = () => {
   resetForm()
 }
 
+const updateIsMobile = () => {
+  if (typeof window === 'undefined') return
+  isMobile.value = window.innerWidth <= 768
+}
+
 onMounted(() => {
+  updateIsMobile()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', updateIsMobile)
+  }
   loadProjects()
+})
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', updateIsMobile)
+  }
 })
 </script>
 
@@ -454,6 +518,77 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
+.project-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.project-card {
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 16px;
+  background-color: var(--card-bg);
+  box-shadow: var(--shadow);
+}
+
+.project-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.project-card .card-title {
+  font-size: 18px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.project-card .card-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.project-card-body {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.project-card .card-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.project-card .field-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.project-card .field-value {
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.project-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.icon-action-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* 管理作業按鈕 - 統一為無底色樣式 */
 .manage-btn {
   min-width: 90px;
@@ -614,6 +749,41 @@ onMounted(() => {
 
 .add-project-btn :deep(.el-icon) {
   margin-right: 6px;
+}
+
+@media (max-width: 768px) {
+  .project-management {
+    padding: var(--spacing-xl);
+  }
+
+  .project-management :deep(.el-card__header),
+  .project-management :deep(.el-card__body) {
+    padding: var(--spacing-xl);
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .add-project-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .project-management :deep(.project-table) {
+    overflow-x: auto;
+  }
+
+  .project-card-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .manage-btn {
+    width: 100%;
+  }
 }
 </style>
 
