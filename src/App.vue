@@ -15,9 +15,27 @@
         </div>
       </div>
       <div class="header-right">
+        <div class="language-switcher">
+          <el-dropdown @command="handleLanguageChange">
+            <span class="language-btn">
+              <el-icon><Position /></el-icon>
+              <span class="language-text">{{ currentLanguageLabel }}</span>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="zh-TW" :class="{ 'is-active': currentLocale === 'zh-TW' }">
+                  繁體中文
+                </el-dropdown-item>
+                <el-dropdown-item command="en-US" :class="{ 'is-active': currentLocale === 'en-US' }">
+                  English
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
         <div class="user-info">
           <el-icon class="user-icon"><User /></el-icon>
-          <span>管理員</span>
+          <span>{{ $t('nav.admin') }}</span>
           <el-icon class="arrow-icon"><ArrowDown /></el-icon>
         </div>
       </div>
@@ -38,21 +56,21 @@
             to="/projects"
             class="nav-item"
             :class="{ active: activeMenu === '/projects' || activeMenu.startsWith('/projects') }"
-            :title="isCollapsed ? '專案管理' : ''"
+            :title="isCollapsed ? $t('nav.projectManagement') : ''"
             @click="handleNavClick"
           >
             <el-icon><House /></el-icon>
-            <span class="nav-text">專案管理</span>
+            <span class="nav-text">{{ $t('nav.projectManagement') }}</span>
           </router-link>
           <router-link
             to="/optimization"
             class="nav-item"
             :class="{ active: activeMenu === '/optimization' }"
-            :title="isCollapsed ? '進度成本最佳化' : ''"
+            :title="isCollapsed ? $t('nav.optimization') : ''"
             @click="handleNavClick"
           >
             <el-icon><TrendCharts /></el-icon>
-            <span class="nav-text">進度成本最佳化</span>
+            <span class="nav-text">{{ $t('nav.optimization') }}</span>
           </router-link>
         </nav>
       </aside>
@@ -68,10 +86,29 @@
 <script setup>
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { TrendCharts, User, ArrowDown, House, Fold, Expand } from '@element-plus/icons-vue'
+import { useI18n } from 'vue-i18n'
+import { TrendCharts, User, ArrowDown, House, Fold, Expand, Position } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
+const { locale, t } = useI18n()
+
+// 當前語言
+const currentLocale = ref(locale.value)
+
+// 當前語言標籤
+const currentLanguageLabel = computed(() => {
+  return currentLocale.value === 'zh-TW' ? '繁體中文' : 'English'
+})
+
+// 語言切換處理
+const handleLanguageChange = (lang) => {
+  currentLocale.value = lang
+  locale.value = lang
+  localStorage.setItem('app-locale', lang)
+  // 刷新頁面以應用 Element Plus 語言設置
+  window.location.reload()
+}
 
 // 側邊欄收放狀態
 const isCollapsed = ref(false)
@@ -210,6 +247,39 @@ const goToProjects = () => {
 .header-right {
   display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+/* 語言切換器 */
+.language-switcher {
+  display: flex;
+  align-items: center;
+}
+
+.language-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 0;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.language-btn:hover {
+  background-color: var(--content-bg);
+  border-color: var(--border-color);
+}
+
+.language-btn .el-icon {
+  font-size: 18px;
+}
+
+.language-text {
+  font-size: 14px;
 }
 
 .user-info {
@@ -392,6 +462,10 @@ const goToProjects = () => {
   }
 
   .user-info span {
+    display: none;
+  }
+
+  .language-text {
     display: none;
   }
 }

@@ -2,13 +2,13 @@
   <div class="result-analysis">
     <!-- 麵包屑導航 -->
     <el-breadcrumb separator="/" class="breadcrumb">
-      <el-breadcrumb-item>首頁</el-breadcrumb-item>
-      <el-breadcrumb-item>結果分析</el-breadcrumb-item>
+      <el-breadcrumb-item>{{ $t('nav.home') }}</el-breadcrumb-item>
+      <el-breadcrumb-item>{{ $t('nav.results') }}</el-breadcrumb-item>
     </el-breadcrumb>
 
     <!-- 頁面標題和匯出按鈕 -->
     <div class="page-header-bar">
-      <h1 class="page-title">優化結果分析</h1>
+      <h1 class="page-title">{{ $t('results.title') }}</h1>
       <div class="export-buttons">
         <el-button 
           type="primary" 
@@ -17,7 +17,7 @@
           class="export-btn"
         >
           <el-icon><Document /></el-icon>
-          匯出 PDF
+          {{ $t('results.exportPDF') }}
         </el-button>
         <el-button 
           type="success" 
@@ -26,7 +26,7 @@
           class="export-btn"
         >
           <el-icon><Document /></el-icon>
-          匯出 Excel
+          {{ $t('results.exportExcel') }}
         </el-button>
       </div>
     </div>
@@ -37,23 +37,23 @@
         <div class="summary-card">
           <div class="summary-grid">
             <div class="summary-item">
-              <div class="summary-label">最優工期</div>
-              <div class="summary-value">{{ result.optimal_duration }} 天</div>
+              <div class="summary-label">{{ $t('results.summary.optimalDuration') }}</div>
+              <div class="summary-value">{{ result.optimal_duration }} {{ $t('common.days') }}</div>
             </div>
             <div class="summary-item">
-              <div class="summary-label">最優成本</div>
+              <div class="summary-label">{{ $t('results.summary.optimalCost') }}</div>
               <div class="summary-value">{{ formatCurrency(result.optimal_cost) }}</div>
             </div>
             <div class="summary-item">
-              <div class="summary-label">違約金</div>
+              <div class="summary-label">{{ $t('results.summary.penaltyAmount') }}</div>
               <div class="summary-value">{{ formatCurrency(result.penalty_amount) }}</div>
             </div>
             <div class="summary-item">
-              <div class="summary-label">獎金</div>
+              <div class="summary-label">{{ $t('results.summary.bonusAmount') }}</div>
               <div class="summary-value">{{ formatCurrency(result.bonus_amount) }}</div>
             </div>
             <div class="summary-item total-item">
-              <div class="summary-label">總成本（含獎懲）</div>
+              <div class="summary-label">{{ $t('results.summary.totalCost') }}</div>
               <div class="summary-value total-value">{{ formatCurrency(result.total_cost) }}</div>
             </div>
           </div>
@@ -62,7 +62,7 @@
         <!-- 甘特圖卡片 -->
         <div class="chart-card">
           <div class="chart-header">
-            <h2 class="chart-title">作業排程甘特圖</h2>
+            <h2 class="chart-title">{{ $t('results.ganttChart') }}</h2>
           </div>
           <div class="chart-content">
             <GanttChart :schedules="result.schedules" />
@@ -72,7 +72,7 @@
         <!-- 成本分析圖表卡片 -->
         <div class="chart-card">
           <div class="chart-header">
-            <h2 class="chart-title">成本分析</h2>
+            <h2 class="chart-title">{{ $t('results.costAnalysis') }}</h2>
           </div>
           <div class="chart-content">
             <CostChart :schedules="result.schedules" />
@@ -82,22 +82,22 @@
         <!-- 作業排程明細表格 -->
         <div class="table-card">
           <div class="table-header">
-            <h2 class="table-title">作業排程明細</h2>
+            <h2 class="table-title">{{ $t('results.scheduleDetail') }}</h2>
           </div>
           <div class="table-content">
             <el-table :data="result.schedules" stripe border class="schedule-table">
-              <el-table-column prop="activity_name" label="作業名稱" width="200" />
-              <el-table-column prop="start_time" label="開始時間（天）" width="120" align="center" />
-              <el-table-column prop="end_time" label="結束時間（天）" width="120" align="center" />
-              <el-table-column prop="duration" label="工期（天）" width="100" align="center" />
-              <el-table-column prop="is_crashed" label="是否趕工" width="120" align="center">
+              <el-table-column prop="activity_name" :label="$t('results.activityName')" width="200" />
+              <el-table-column prop="start_time" :label="$t('results.startTime')" width="120" align="center" />
+              <el-table-column prop="end_time" :label="$t('results.endTime')" width="120" align="center" />
+              <el-table-column prop="duration" :label="$t('results.duration')" width="100" align="center" />
+              <el-table-column prop="is_crashed" :label="$t('results.crashed')" width="120" align="center">
                 <template #default="{ row }">
                   <el-tag :type="row.is_crashed ? 'warning' : 'success'" class="status-tag">
-                    {{ row.is_crashed ? '是' : '否' }}
+                    {{ row.is_crashed ? $t('results.yes') : $t('results.no') }}
                   </el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="cost" label="成本" align="right">
+              <el-table-column prop="cost" :label="$t('results.cost')" align="right">
                 <template #default="{ row }">
                   <span class="cost-text">{{ formatCurrency(row.cost) }}</span>
                 </template>
@@ -116,7 +116,7 @@
         />
       </div>
 
-      <el-empty v-else description="沒有找到優化結果" class="empty-state" />
+      <el-empty v-else :description="$t('result.noResults')" class="empty-state" />
     </div>
   </div>
 </template>
@@ -124,6 +124,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { Document } from '@element-plus/icons-vue'
 import { optimizationAPI } from '../services/api'
@@ -134,6 +135,7 @@ import { exportToPDF } from '../utils/pdfGenerator'
 import { exportToExcel } from '../utils/excelGenerator'
 
 const route = useRoute()
+const { t } = useI18n()
 
 const result = ref(null)
 const loading = ref(false)
@@ -152,7 +154,7 @@ const hasOptimizationData = computed(() => {
 const loadResult = async () => {
   const scenarioId = route.params.resultId
   if (!scenarioId) {
-    ElMessage.warning('請提供優化結果 ID')
+    ElMessage.warning(t('results.missingResultId'))
     return
   }
 
@@ -160,7 +162,7 @@ const loadResult = async () => {
   try {
     result.value = await optimizationAPI.getResult(scenarioId)
   } catch (error) {
-    ElMessage.error('載入優化結果失敗：' + error.message)
+    ElMessage.error(t('results.loadError', { error: error.message }))
   } finally {
     loading.value = false
   }
@@ -169,16 +171,16 @@ const loadResult = async () => {
 // 匯出 PDF
 const exportPDF = async () => {
   if (!result.value) {
-    ElMessage.warning('沒有可匯出的結果')
+    ElMessage.warning(t('results.noDataToExport'))
     return
   }
 
   exportingPDF.value = true
   try {
     await exportToPDF(result.value)
-    ElMessage.success('PDF 匯出成功')
+    ElMessage.success(t('results.exportPDFSuccess'))
   } catch (error) {
-    ElMessage.error('PDF 匯出失敗：' + error.message)
+    ElMessage.error(t('results.exportPDFError', { error: error.message }))
   } finally {
     exportingPDF.value = false
   }
@@ -187,16 +189,16 @@ const exportPDF = async () => {
 // 匯出 Excel
 const exportExcel = async () => {
   if (!result.value) {
-    ElMessage.warning('沒有可匯出的結果')
+    ElMessage.warning(t('results.noDataToExport'))
     return
   }
 
   exportingExcel.value = true
   try {
     await exportToExcel(result.value)
-    ElMessage.success('Excel 匯出成功')
+    ElMessage.success(t('results.exportExcelSuccess'))
   } catch (error) {
-    ElMessage.error('Excel 匯出失敗：' + error.message)
+    ElMessage.error(t('results.exportExcelError', { error: error.message }))
   } finally {
     exportingExcel.value = false
   }

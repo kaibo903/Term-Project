@@ -2,14 +2,14 @@
   <div class="bidding-optimization">
     <!-- 麵包屑導航 -->
     <el-breadcrumb separator="/" class="breadcrumb">
-      <el-breadcrumb-item>首頁</el-breadcrumb-item>
-      <el-breadcrumb-item>進度成本最佳化</el-breadcrumb-item>
+      <el-breadcrumb-item>{{ $t('nav.home') }}</el-breadcrumb-item>
+      <el-breadcrumb-item>{{ $t('nav.optimization') }}</el-breadcrumb-item>
     </el-breadcrumb>
 
     <!-- 頁面標題 -->
     <div class="page-header">
-      <h1 class="page-title">進度成本最佳化決策</h1>
-      <p class="page-subtitle">輸入專案條件，系統將自動計算最佳工期與成本方案</p>
+      <h1 class="page-title">{{ $t('optimization.title') }}</h1>
+      <p class="page-subtitle">{{ $t('optimization.subtitle') }}</p>
     </div>
 
     <!-- 主要內容區域 -->
@@ -17,21 +17,21 @@
       <!-- 左側：參數設定 -->
       <div class="settings-panel">
         <div class="panel-header-new">
-          <h2 class="panel-title-new">參數設定</h2>
+          <h2 class="panel-title-new">{{ $t('optimization.settings') }}</h2>
         </div>
         
         <el-form :model="optimizationForm" :rules="rules" ref="formRef" class="optimization-form-new">
           <!-- 基本資訊區塊 -->
           <div class="form-block">
-            <div class="block-title">基本資訊</div>
+            <div class="block-title">{{ $t('optimization.basicInfo') }}</div>
             
             <div class="form-row-new form-row-two-col">
               <div class="form-item-new form-item-half">
-                <label class="item-label">選擇專案</label>
+                <label class="item-label">{{ $t('optimization.selectProject') }}</label>
                 <el-form-item prop="project_id" class="form-item-wrapper">
                   <el-select
                     v-model="optimizationForm.project_id"
-                    placeholder="請選擇專案"
+                    :placeholder="$t('optimization.selectProjectPlaceholder')"
                     class="select-input"
                     @change="loadProjectActivities"
                   >
@@ -45,15 +45,15 @@
                 </el-form-item>
               </div>
               <div class="form-item-new form-item-half">
-                <label class="item-label">計算模式</label>
+                <label class="item-label">{{ $t('optimization.mode') }}</label>
                 <el-form-item prop="mode" class="form-item-wrapper">
                   <el-radio-group 
                     v-model="optimizationForm.mode" 
                     @change="handleModeChange" 
                     class="mode-group-new"
                   >
-                    <el-radio-button label="budget_to_duration">預算固定</el-radio-button>
-                    <el-radio-button label="duration_to_cost">工期固定</el-radio-button>
+                    <el-radio-button label="budget_to_duration">{{ $t('optimization.budgetFixed') }}</el-radio-button>
+                    <el-radio-button label="duration_to_cost">{{ $t('optimization.durationFixed') }}</el-radio-button>
                   </el-radio-group>
                 </el-form-item>
               </div>
@@ -62,7 +62,7 @@
             <div class="form-row-new form-row-two-col">
               <div class="form-item-new form-item-half">
                 <label class="item-label">
-                  {{ optimizationForm.mode === 'budget_to_duration' ? '預算上限' : '必須完成天數' }}
+                  {{ optimizationForm.mode === 'budget_to_duration' ? $t('optimization.budgetConstraint') : $t('optimization.durationConstraint') }}
                 </label>
                 <el-form-item
                   :prop="optimizationForm.mode === 'budget_to_duration' ? 'budget_constraint' : 'duration_constraint'"
@@ -75,10 +75,10 @@
                     :precision="0"
                     :step="10000"
                     class="number-input"
-                    placeholder="上限"
+                    :placeholder="$t('optimization.budgetPlaceholder')"
                     :controls="false"
                   >
-                    <template #prefix>NT$</template>
+                    <template #prefix>{{ $t('common.currency') }}</template>
                   </el-input-number>
                   <el-input-number
                     v-else
@@ -86,13 +86,13 @@
                     :min="1"
                     :precision="0"
                     class="number-input"
-                    placeholder="請輸入必須完成的天數"
+                    :placeholder="$t('optimization.durationPlaceholder')"
                     :controls="false"
                   />
                 </el-form-item>
               </div>
               <div class="form-item-new form-item-half">
-                <label class="item-label">每日間接成本</label>
+                <label class="item-label">{{ $t('optimization.indirectCost') }}</label>
                 <el-form-item class="form-item-wrapper">
                   <el-input-number
                     v-model="optimizationForm.indirect_cost"
@@ -100,10 +100,10 @@
                     :precision="0"
                     :step="10000"
                     class="number-input"
-                    placeholder="請輸入每日間接成本"
+                    :placeholder="$t('optimization.indirectCostPlaceholder')"
                     :controls="false"
                   >
-                    <template #prefix>NT$</template>
+                    <template #prefix>{{ $t('common.currency') }}</template>
                   </el-input-number>
                 </el-form-item>
               </div>
@@ -112,12 +112,12 @@
 
           <!-- 獎懲設定區塊 -->
           <div class="form-block">
-            <div class="block-title">獎懲設定</div>
+            <div class="block-title">{{ $t('optimization.penaltySettings') }}</div>
             
             <div class="form-row-new form-row-two-col">
               <div class="form-item-new form-item-half">
                 <label class="item-label">
-                  違約金計算方式
+                  {{ $t('optimization.penaltyType') }}
                   <el-popover
                     placement="top"
                     :width="400"
@@ -128,11 +128,11 @@
                       <el-icon class="help-icon"><QuestionFilled /></el-icon>
                     </template>
                     <div class="calculation-info">
-                      <h4 class="info-title">逾期違約金計算方式</h4>
+                      <h4 class="info-title">{{ $t('optimization.penaltyCalculation.title') }}</h4>
                       <div class="info-content">
-                        <p><strong>定額計算：</strong>每日固定金額 × 逾期天數</p>
-                        <p><strong>比率計算：</strong>契約金額 × 違約金比率 × 逾期天數</p>
-                        <p class="info-note">⚠️ 違約金上限：契約價金總額的 20%</p>
+                        <p><strong>{{ $t('optimization.penaltyCalculation.fixed') }}</strong></p>
+                        <p><strong>{{ $t('optimization.penaltyCalculation.rate') }}</strong></p>
+                        <p class="info-note">⚠️ {{ $t('optimization.penaltyCalculation.limit') }}</p>
                       </div>
                     </div>
                   </el-popover>
@@ -143,13 +143,13 @@
                     @change="handlePenaltyTypeChange" 
                     class="penalty-group-new"
                   >
-                    <el-radio-button label="fixed">定額</el-radio-button>
-                    <el-radio-button label="rate">比率</el-radio-button>
+                    <el-radio-button label="fixed">{{ $t('optimization.penaltyTypeFixed') }}</el-radio-button>
+                    <el-radio-button label="rate">{{ $t('optimization.penaltyTypeRate') }}</el-radio-button>
                   </el-radio-group>
                 </el-form-item>
               </div>
               <div class="form-item-new form-item-half" v-if="optimizationForm.penalty_type === 'fixed'">
-                <label class="item-label">每日違約金</label>
+                <label class="item-label">{{ $t('optimization.penaltyAmount') }}</label>
                 <el-form-item class="form-item-wrapper">
                   <el-input-number
                     v-model="optimizationForm.penalty_amount"
@@ -157,15 +157,15 @@
                     :precision="0"
                     :step="1000"
                     class="number-input"
-                    placeholder="請輸入每日違約金"
+                    :placeholder="$t('optimization.penaltyAmountPlaceholder')"
                     :controls="false"
                   >
-                    <template #prefix>NT$</template>
+                    <template #prefix>{{ $t('common.currency') }}</template>
                   </el-input-number>
                 </el-form-item>
               </div>
               <div class="form-item-new form-item-half" v-if="optimizationForm.penalty_type === 'rate'">
-                <label class="item-label">違約金比率</label>
+                <label class="item-label">{{ $t('optimization.penaltyRate') }}</label>
                 <el-form-item class="form-item-wrapper">
                   <el-input-number
                     v-model="optimizationForm.penalty_rate"
@@ -173,7 +173,7 @@
                     :precision="6"
                     :step="0.0001"
                     class="number-input"
-                    placeholder="請輸入違約金比率"
+                    :placeholder="$t('optimization.penaltyRatePlaceholder')"
                     :controls="false"
                   />
                 </el-form-item>
@@ -182,7 +182,7 @@
 
             <div class="form-row-new form-row-two-col">
               <div class="form-item-new form-item-half">
-                <label class="item-label">契約決標總價</label>
+                <label class="item-label">{{ $t('optimization.contractAmount') }}</label>
                 <el-form-item class="form-item-wrapper">
                   <el-input-number
                     v-model="optimizationForm.contract_amount"
@@ -190,16 +190,16 @@
                     :precision="0"
                     :step="10000"
                     class="number-input"
-                    placeholder="請輸入契約決標總價"
+                    :placeholder="$t('optimization.contractAmountPlaceholder')"
                     :controls="false"
                   >
-                    <template #prefix>NT$</template>
+                    <template #prefix>{{ $t('common.currency') }}</template>
                   </el-input-number>
                 </el-form-item>
               </div>
               <div class="form-item-new form-item-half">
                 <label class="item-label">
-                  契約工期
+                  {{ $t('optimization.contractDuration') }}
                   <el-popover
                     placement="top"
                     :width="400"
@@ -210,13 +210,13 @@
                       <el-icon class="help-icon"><QuestionFilled /></el-icon>
                     </template>
                     <div class="calculation-info">
-                      <h4 class="info-title">趕工獎金計算方式</h4>
+                      <h4 class="info-title">{{ $t('optimization.bonusCalculation.title') }}</h4>
                       <div class="info-content">
-                        <p><strong>計算公式：</strong></p>
-                        <p class="formula">趕工獎金 = 合約總價 × 提前之工期 ÷ 契約工期 × 5%</p>
-                        <p class="info-example">範例：合約總價 1000 萬，契約工期 100 天，提前 10 天完成</p>
-                        <p class="info-example">趕工獎金 = 10,000,000 × 10 ÷ 100 × 5% = 50,000</p>
-                        <p class="info-note">⚠️ 趕工獎金上限：合約總價的 1%</p>
+                        <p><strong>{{ $t('optimization.bonusCalculation.formula') }}</strong></p>
+                        <p class="formula">{{ $t('optimization.bonusCalculation.formulaText') }}</p>
+                        <p class="info-example">{{ $t('optimization.bonusCalculation.example') }}</p>
+                        <p class="info-example">{{ $t('optimization.bonusCalculation.exampleCalc') }}</p>
+                        <p class="info-note">⚠️ {{ $t('optimization.bonusCalculation.limit') }}</p>
                       </div>
                     </div>
                   </el-popover>
@@ -227,7 +227,7 @@
                     :min="1"
                     :precision="0"
                     class="number-input"
-                    placeholder="請輸入契約工期"
+                    :placeholder="$t('optimization.contractDurationPlaceholder')"
                     :controls="false"
                   />
                 </el-form-item>
@@ -236,14 +236,14 @@
 
             <div class="form-row-new">
               <div class="form-item-new">
-                <label class="item-label">目標完成天數</label>
+                <label class="item-label">{{ $t('optimization.targetDuration') }}</label>
                 <el-form-item class="form-item-wrapper">
                   <el-input-number
                     v-model="optimizationForm.target_duration"
                     :min="1"
                     :precision="0"
                     class="number-input"
-                    placeholder="請輸入目標完成天數（可選）"
+                    :placeholder="$t('optimization.targetDurationPlaceholder')"
                     :controls="false"
                   />
                 </el-form-item>
@@ -261,14 +261,14 @@
               class="submit-btn-new"
             >
               <el-icon v-if="!optimizing"><Search /></el-icon>
-              {{ optimizing ? '計算中...' : '開始計算' }}
+              {{ optimizing ? $t('optimization.calculating') : $t('optimization.calculate') }}
             </el-button>
             <el-button 
               @click="resetForm" 
               class="reset-btn-new"
               :disabled="optimizing"
             >
-              重設
+              {{ $t('common.reset') }}
             </el-button>
           </div>
         </el-form>
@@ -277,7 +277,7 @@
       <!-- 右側：計算結果 -->
       <div class="results-panel">
         <div class="panel-header-new">
-          <h2 class="panel-title-new">計算結果</h2>
+          <h2 class="panel-title-new">{{ $t('optimization.results') }}</h2>
         </div>
         
         <div v-if="optimizationResult" class="results-content">
@@ -285,39 +285,39 @@
           <!-- 關鍵指標 -->
           <div class="metrics-grid-new">
             <div class="metric-item-new primary">
-              <div class="metric-label-new">建議工期</div>
+              <div class="metric-label-new">{{ $t('optimization.optimalDuration') }}</div>
               <div class="metric-value-new">{{ optimizationResult.optimal_duration }}</div>
-              <div class="metric-unit-new">天</div>
+              <div class="metric-unit-new">{{ $t('common.days') }}</div>
             </div>
             <div class="metric-item-new">
-              <div class="metric-label-new">直接成本</div>
+              <div class="metric-label-new">{{ $t('optimization.directCost') }}</div>
               <div class="metric-value-new">{{ formatCurrency(optimizationResult.optimal_cost) }}</div>
             </div>
             <div class="metric-item-new">
-              <div class="metric-label-new">間接成本</div>
+              <div class="metric-label-new">{{ $t('optimization.indirectCostTotal') }}</div>
               <div class="metric-value-new">{{ formatCurrency(optimizationResult.indirect_cost || 0) }}</div>
             </div>
             <div class="metric-item-new highlight">
-              <div class="metric-label-new">總成本</div>
+              <div class="metric-label-new">{{ $t('optimization.totalCost') }}</div>
               <div class="metric-value-new">{{ formatCurrency(optimizationResult.total_cost) }}</div>
-              <div class="metric-note-new">（含獎懲）</div>
+              <div class="metric-note-new">{{ $t('optimization.totalCostNote') }}</div>
             </div>
           </div>
 
           <!-- 獎懲資訊 -->
           <div class="summary-section-new">
             <div class="summary-item-new">
-              <div class="summary-label-new">逾期違約金</div>
+              <div class="summary-label-new">{{ $t('optimization.penaltyAmount') }}</div>
               <div class="summary-value-new">{{ formatCurrency(optimizationResult.penalty_amount) }}</div>
               <div v-if="optimizationForm.contract_amount > 0" class="summary-hint-new">
-                上限：{{ formatCurrency(optimizationForm.contract_amount * 0.2) }}（契約總額 20%）
+                {{ $t('optimization.penaltyLimit', { amount: formatCurrency(optimizationForm.contract_amount * 0.2) }) }}
               </div>
             </div>
             <div class="summary-item-new">
-              <div class="summary-label-new">提前完成趕工獎金</div>
+              <div class="summary-label-new">{{ $t('optimization.bonusAmount') }}</div>
               <div class="summary-value-new">{{ formatCurrency(optimizationResult.bonus_amount) }}</div>
               <div v-if="optimizationForm.contract_amount > 0 && optimizationForm.contract_duration" class="summary-hint-new">
-                上限：{{ formatCurrency(optimizationForm.contract_amount * 0.01) }}（契約總價 1%）
+                {{ $t('optimization.bonusLimit', { amount: formatCurrency(optimizationForm.contract_amount * 0.01) }) }}
               </div>
             </div>
           </div>
@@ -326,36 +326,30 @@
           <div class="calculation-info-card" v-if="optimizationResult">
             <div class="section-title-new">
               <el-icon><InfoFilled /></el-icon>
-              <span>最佳化結果摘要</span>
+              <span>{{ $t('optimization.resultSummary') }}</span>
             </div>
             <div class="calculation-info">
               <p>
-                <strong>計算完成！</strong>
-                系統已使用
-                <strong>混合整數線性規劃（MILP）</strong>
-                求解出最佳方案。
+                {{ $t('optimization.summaryText') }}
               </p>
 
               <div class="formula">
-                <div>直接成本：{{ formatCurrency(optimizationResult.optimal_cost) }}</div>
-                <div>＋ 間接成本：{{ formatCurrency(optimizationResult.indirect_cost) }}</div>
-                <div>＋ 違約金：{{ formatCurrency(optimizationResult.penalty_amount) }}</div>
-                <div>− 趕工獎金：{{ formatCurrency(optimizationResult.bonus_amount) }}</div>
+                <div>{{ $t('optimization.costFormula.direct', { amount: formatCurrency(optimizationResult.optimal_cost) }) }}</div>
+                <div>{{ $t('optimization.costFormula.indirect', { amount: formatCurrency(optimizationResult.indirect_cost) }) }}</div>
+                <div>{{ $t('optimization.costFormula.penalty', { amount: formatCurrency(optimizationResult.penalty_amount) }) }}</div>
+                <div>{{ $t('optimization.costFormula.bonus', { amount: formatCurrency(optimizationResult.bonus_amount) }) }}</div>
                 <div class="formula-total">
-                  ＝ 總成本（含獎懲）：
-                  <strong>{{ formatCurrency(optimizationResult.total_cost) }}</strong>
+                  {{ $t('optimization.costFormula.total', { amount: formatCurrency(optimizationResult.total_cost) }) }}
                 </div>
               </div>
 
               <p>
-                在本次結果中，系統從專案的 {{ optimizationResult.schedules?.length || 0 }} 個作業中，自動選擇
-                <strong>{{ crashedActivities.length }}</strong> 個作業進行壓縮（縮短工期、提高趕工成本），
-                並重新排程每一個作業的開始與結束時間，使得上述目標函數達到最佳值。
+                {{ $t('optimization.crashedActivities', { total: optimizationResult.schedules?.length || 0, crashed: crashedActivities.length }) }}
               </p>
 
               <div class="info-tip">
                 <el-icon><QuestionFilled /></el-icon>
-                <span>想了解詳細的數學模型與計算過程？請點擊下方「查看詳細結果與圖表」按鈕，在結果分析頁面中有完整的 MILP 數學推導與一步一步的計算說明。</span>
+                <span>{{ $t('optimization.detailTip') }}</span>
               </div>
             </div>
           </div>
@@ -366,13 +360,13 @@
             <el-collapse-item 
               v-if="optimizationResult.schedules && optimizationResult.schedules.length > 0" 
               name="schedules"
-              title="詳細作業排程"
+              :title="$t('optimization.scheduleDetail')"
             >
               <!-- 壓縮作業摘要 -->
               <div v-if="crashedActivities.length > 0" class="crashed-info-new">
                 <div class="crashed-header-new">
                   <el-icon><Warning /></el-icon>
-                  <span>壓縮的作業項目（{{ crashedActivities.length }} 項）</span>
+                  <span>{{ $t('optimization.crashedInfo', { count: crashedActivities.length }) }}</span>
                 </div>
                 <div class="crashed-tags-new">
                   <el-tag
@@ -389,23 +383,23 @@
 
               <div class="table-container-new">
                 <el-table :data="optimizationResult.schedules" class="data-table-new compact-table" border size="small">
-                  <el-table-column prop="activity_name" label="作業名稱" min-width="120" />
-                  <el-table-column prop="start_time" label="開始" width="60" align="center">
-                    <template #default="{ row }">{{ row.start_time }}天</template>
+                  <el-table-column prop="activity_name" :label="$t('optimization.activityName')" min-width="120" />
+                  <el-table-column prop="start_time" :label="$t('optimization.startTime')" width="60" align="center">
+                    <template #default="{ row }">{{ row.start_time }}{{ $t('common.days') }}</template>
                   </el-table-column>
-                  <el-table-column prop="end_time" label="結束" width="60" align="center">
-                    <template #default="{ row }">{{ row.end_time }}天</template>
+                  <el-table-column prop="end_time" :label="$t('optimization.endTime')" width="60" align="center">
+                    <template #default="{ row }">{{ row.end_time }}{{ $t('common.days') }}</template>
                   </el-table-column>
-                  <el-table-column prop="duration" label="工期" width="60" align="center">
-                    <template #default="{ row }">{{ row.duration }}天</template>
+                  <el-table-column prop="duration" :label="$t('optimization.duration')" width="60" align="center">
+                    <template #default="{ row }">{{ row.duration }}{{ $t('common.days') }}</template>
                   </el-table-column>
-                  <el-table-column prop="cost" label="成本" width="100" align="right">
+                  <el-table-column prop="cost" :label="$t('optimization.cost')" width="100" align="right">
                     <template #default="{ row }">{{ formatCurrency(row.cost) }}</template>
                   </el-table-column>
-                  <el-table-column prop="is_crashed" label="狀態" width="70" align="center">
+                  <el-table-column prop="is_crashed" :label="$t('optimization.status')" width="70" align="center">
                     <template #default="{ row }">
-                      <el-tag v-if="row.is_crashed" type="warning" size="small">已壓縮</el-tag>
-                      <el-tag v-else type="success" size="small">正常</el-tag>
+                      <el-tag v-if="row.is_crashed" type="warning" size="small">{{ $t('optimization.crashed') }}</el-tag>
+                      <el-tag v-else type="success" size="small">{{ $t('optimization.normal') }}</el-tag>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -417,7 +411,7 @@
           <div class="action-section-new">
             <el-button type="primary" @click="viewDetailedResult" class="detail-btn-new">
               <el-icon><DataAnalysis /></el-icon>
-              查看詳細結果與圖表
+              {{ $t('optimization.viewDetails') }}
             </el-button>
           </div>
         </div>
@@ -425,8 +419,8 @@
         <!-- 空狀態 -->
         <div v-else class="empty-state-new">
           <div class="empty-icon-new">📊</div>
-          <div class="empty-title-new">尚未進行計算</div>
-          <div class="empty-desc-new">請在左側完成設定後，點擊「開始計算」按鈕</div>
+          <div class="empty-title-new">{{ $t('optimization.noResults') }}</div>
+          <div class="empty-desc-new">{{ $t('optimization.noResultsDesc') }}</div>
         </div>
       </div>
     </div>
@@ -436,6 +430,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { 
   Search, 
@@ -452,6 +447,7 @@ import {
 import { projectAPI, optimizationAPI } from '../services/api'
 
 const router = useRouter()
+const { t } = useI18n()
 
 const projects = ref([])
 const optimizing = ref(false)
@@ -472,14 +468,14 @@ const optimizationForm = ref({
   target_duration: null
 })
 
-const rules = {
-  project_id: [{ required: true, message: '請選擇專案', trigger: 'change' }],
-  mode: [{ required: true, message: '請選擇決策模式', trigger: 'change' }],
+const rules = computed(() => ({
+  project_id: [{ required: true, message: t('optimization.validation.projectRequired'), trigger: 'change' }],
+  mode: [{ required: true, message: t('optimization.validation.modeRequired'), trigger: 'change' }],
   budget_constraint: [
     {
       validator: (rule, value, callback) => {
         if (optimizationForm.value.mode === 'budget_to_duration' && !value) {
-          callback(new Error('請輸入預算約束'))
+          callback(new Error(t('optimization.validation.budgetRequired')))
         } else {
           callback()
         }
@@ -491,7 +487,7 @@ const rules = {
     {
       validator: (rule, value, callback) => {
         if (optimizationForm.value.mode === 'duration_to_cost' && !value) {
-          callback(new Error('請輸入工期約束'))
+          callback(new Error(t('optimization.validation.durationRequired')))
         } else {
           callback()
         }
@@ -499,14 +495,14 @@ const rules = {
       trigger: 'blur'
     }
   ]
-}
+}))
 
 // 載入專案列表
 const loadProjects = async () => {
   try {
     projects.value = await projectAPI.getProjects()
   } catch (error) {
-    ElMessage.error('載入專案列表失敗：' + error.message)
+    ElMessage.error(t('optimization.loadProjectsError', { error: error.message }))
   }
 }
 
@@ -549,7 +545,7 @@ const resetForm = () => {
   if (formRef.value) {
     formRef.value.clearValidate()
   }
-  ElMessage.success('表單已重置')
+  ElMessage.success(t('optimization.resetSuccess'))
 }
 
 // 執行優化計算
@@ -563,9 +559,9 @@ const runOptimization = async () => {
     try {
       const result = await optimizationAPI.optimize(optimizationForm.value)
       optimizationResult.value = result
-      ElMessage.success('優化計算完成')
+      ElMessage.success(t('optimization.success'))
     } catch (error) {
-      ElMessage.error('優化計算失敗：' + error.message)
+      ElMessage.error(t('optimization.error', { error: error.message }))
     } finally {
       optimizing.value = false
     }

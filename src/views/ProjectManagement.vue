@@ -2,16 +2,16 @@
   <div class="project-management">
     <!-- 麵包屑導航 -->
     <el-breadcrumb separator="/" class="breadcrumb">
-      <el-breadcrumb-item>首頁</el-breadcrumb-item>
+      <el-breadcrumb-item>{{ $t('nav.home') }}</el-breadcrumb-item>
     </el-breadcrumb>
 
     <el-card>
       <template #header>
         <div class="card-header">
-          <h2 class="page-title">專案管理</h2>
+          <h2 class="page-title">{{ $t('project.title') }}</h2>
           <el-button type="primary" @click="showCreateDialog = true" class="add-project-btn">
             <el-icon><Plus /></el-icon>
-            新增專案
+            {{ $t('project.create') }}
           </el-button>
         </div>
       </template>
@@ -25,9 +25,9 @@
           :empty-text="emptyText"
           class="project-table"
         >
-          <el-table-column prop="name" label="專案名稱" width="220" />
-          <el-table-column prop="description" label="描述" min-width="120" show-overflow-tooltip />
-          <el-table-column prop="status" label="狀態" width="120">
+          <el-table-column prop="name" :label="$t('project.name')" width="220" />
+          <el-table-column prop="description" :label="$t('project.description')" min-width="120" show-overflow-tooltip />
+          <el-table-column prop="status" :label="$t('project.status')" width="120">
             <template #default="{ row }">
               <el-tag 
                 :type="getStatusType(row.status)" 
@@ -38,12 +38,12 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="created_at" label="建立時間" width="200">
+          <el-table-column prop="created_at" :label="$t('project.createdAt')" width="200">
             <template #default="{ row }">
               <span style="white-space: nowrap;">{{ formatDate(row.created_at) }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="240" fixed="right">
+          <el-table-column :label="$t('project.actions')" width="240" fixed="right">
             <template #default="{ row }">
               <div class="action-buttons">
                 <el-button 
@@ -52,7 +52,7 @@
                   class="action-btn manage-btn"
                   plain
                 >
-                  管理作業
+                  {{ $t('project.manageActivities') }}
                 </el-button>
                 <el-button size="small" type="primary" @click="editProject(row)" :icon="Edit" text class="action-btn icon-btn" />
                 <el-button size="small" type="danger" @click="deleteProject(row)" :icon="Delete" text class="action-btn icon-btn" />
@@ -84,7 +84,7 @@
               </div>
               <div class="project-card-body">
                 <div class="card-field">
-                  <span class="field-label">描述</span>
+                  <span class="field-label">{{ $t('project.description') }}</span>
                   <span class="field-value">{{ project.description || '—' }}</span>
                 </div>
               </div>
@@ -95,7 +95,7 @@
                   class="action-btn manage-btn"
                   plain
                 >
-                  管理作業
+                  {{ $t('project.manageActivities') }}
                 </el-button>
                 <div class="icon-action-group">
                   <el-button size="small" type="primary" @click="editProject(project)" :icon="Edit" text class="action-btn icon-btn" />
@@ -112,39 +112,39 @@
     <!-- 建立/編輯專案對話框 -->
     <el-dialog
       v-model="showCreateDialog"
-      :title="editingProject ? '編輯專案' : '新增專案'"
+      :title="editingProject ? $t('project.edit') : $t('project.create')"
       width="500px"
     >
       <el-form :model="projectForm" label-width="100px">
-        <el-form-item label="專案名稱" required>
-          <el-input v-model="projectForm.name" placeholder="請輸入專案名稱" />
+        <el-form-item :label="$t('project.name')" required>
+          <el-input v-model="projectForm.name" :placeholder="$t('project.namePlaceholder')" />
         </el-form-item>
-        <el-form-item label="描述">
+        <el-form-item :label="$t('project.description')">
           <el-input
             v-model="projectForm.description"
             type="textarea"
             :rows="3"
-            placeholder="請輸入專案描述"
+            :placeholder="$t('project.descriptionPlaceholder')"
           />
         </el-form-item>
-        <el-form-item label="狀態">
+        <el-form-item :label="$t('project.status')">
           <el-select v-model="projectForm.status">
-            <el-option label="草稿" value="draft" />
-            <el-option label="進行中" value="active" />
-            <el-option label="已完成" value="completed" />
+            <el-option :label="$t('project.status.draft')" value="draft" />
+            <el-option :label="$t('project.status.active')" value="active" />
+            <el-option :label="$t('project.status.completed')" value="completed" />
           </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showCreateDialog = false">取消</el-button>
-        <el-button type="primary" @click="saveProject" :loading="saving">確定</el-button>
+        <el-button @click="showCreateDialog = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="saveProject" :loading="saving">{{ $t('common.confirm') }}</el-button>
       </template>
     </el-dialog>
 
     <!-- 作業管理對話框 -->
     <el-dialog
       v-model="showActivityDialog"
-      title="作業活動管理"
+      :title="$t('activity.title')"
       :width="isMobile ? '95%' : '90%'"
       :close-on-click-modal="false"
       class="activity-dialog-responsive"
@@ -159,11 +159,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
+import { useI18n } from 'vue-i18n'
 import { projectAPI } from '../services/api'
 import ActivityTable from '../components/ActivityTable.vue'
+
+const { t } = useI18n()
 
 const projects = ref([])
 const loading = ref(false)
@@ -174,7 +177,7 @@ const editingProject = ref(null)
 const currentProject = ref(null)
 const isMobile = ref(false)
 
-const emptyText = '暫無專案資料，請點擊「新增專案」建立第一個專案'
+const emptyText = computed(() => t('project.emptyText'))
 
 const projectForm = ref({
   name: '',
@@ -188,7 +191,7 @@ const loadProjects = async () => {
   try {
     projects.value = await projectAPI.getProjects()
   } catch (error) {
-    ElMessage.error('載入專案列表失敗：' + error.message)
+    ElMessage.error(t('project.loadError', { error: error.message }))
   } finally {
     loading.value = false
   }
@@ -197,7 +200,7 @@ const loadProjects = async () => {
 // 儲存專案
 const saveProject = async () => {
   if (!projectForm.value.name.trim()) {
-    ElMessage.warning('請輸入專案名稱')
+    ElMessage.warning(t('project.nameRequired'))
     return
   }
 
@@ -205,16 +208,16 @@ const saveProject = async () => {
   try {
     if (editingProject.value) {
       await projectAPI.updateProject(editingProject.value.id, projectForm.value)
-      ElMessage.success('專案更新成功')
+      ElMessage.success(t('project.updateSuccess'))
     } else {
       await projectAPI.createProject(projectForm.value)
-      ElMessage.success('專案建立成功')
+      ElMessage.success(t('project.createSuccess'))
     }
     showCreateDialog.value = false
     resetForm()
     loadProjects()
   } catch (error) {
-    ElMessage.error('儲存失敗：' + error.message)
+    ElMessage.error(t('project.saveError', { error: error.message }))
   } finally {
     saving.value = false
   }
@@ -235,18 +238,18 @@ const editProject = (project) => {
 const deleteProject = async (project) => {
   try {
     await ElMessageBox.confirm(
-      `確定要刪除專案「${project.name}」嗎？此操作將刪除所有相關的作業和情境。`,
-      '確認刪除',
+      t('project.deleteConfirm', { name: project.name }),
+      t('project.deleteTitle'),
       {
         type: 'warning'
       }
     )
     await projectAPI.deleteProject(project.id)
-    ElMessage.success('專案已刪除')
+    ElMessage.success(t('project.deleteSuccess'))
     loadProjects()
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('刪除失敗：' + error.message)
+      ElMessage.error(t('project.deleteError', { error: error.message }))
     }
   }
 }
@@ -290,20 +293,17 @@ const getStatusType = (status) => {
   return types[status] || 'info'
 }
 
-// 取得狀態文字（繁體中文）
+// 取得狀態文字
 const getStatusText = (status) => {
-  if (!status) return '草稿'
+  if (!status) return t('project.status.draft')
   const statusLower = String(status).toLowerCase()
-  const texts = {
-    draft: '草稿',
-    active: '進行中',
-    completed: '已完成',
-    complete: '已完成',
-    '進行中': '進行中',
-    '已完成': '已完成',
-    '草稿': '草稿'
+  const statusMap = {
+    draft: 'project.status.draft',
+    active: 'project.status.active',
+    completed: 'project.status.completed',
+    complete: 'project.status.completed'
   }
-  return texts[statusLower] || texts[status] || status
+  return t(statusMap[statusLower] || 'project.status.draft')
 }
 
 // 監聽對話框關閉

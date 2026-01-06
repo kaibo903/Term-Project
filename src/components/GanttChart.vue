@@ -7,7 +7,7 @@
       style="height: 400px; width: 100%;" 
     />
     <div v-else class="empty-chart">
-      <p>沒有資料可顯示</p>
+      <p>{{ $t('common.noChartData') }}</p>
     </div>
   </div>
 </template>

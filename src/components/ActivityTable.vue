@@ -4,14 +4,14 @@
     <div class="table-container">
       <!-- 表格標題和新增按鈕 -->
       <div class="table-header-bar">
-        <h2 class="table-title-text">作業活動管理</h2>
+        <h2 class="table-title-text">{{ $t('activity.title') }}</h2>
         <div class="header-buttons">
           <button 
             @click="showImportDialog = true" 
             class="import-csv-btn-header"
           >
             <el-icon class="add-icon"><Upload /></el-icon>
-            <span class="add-text">CSV 匯入</span>
+            <span class="add-text">{{ $t('activity.csvImport') }}</span>
           </button>
           <button 
             @click="addNewRow" 
@@ -19,7 +19,7 @@
             :disabled="isAddingNew"
           >
             <el-icon class="add-icon"><Plus /></el-icon>
-            <span class="add-text">新增作業</span>
+            <span class="add-text">{{ $t('activity.create') }}</span>
           </button>
         </div>
       </div>
@@ -37,14 +37,14 @@
       <el-table-column prop="name" :label="''" min-width="200" align="center">
         <template #header>
           <div class="header-label">
-            <span class="main-text">作業名稱</span>
+            <span class="main-text">{{ $t('activity.name') }}</span>
           </div>
         </template>
         <template #default="{ row }">
           <el-input
             v-if="row.isEditing"
             v-model="row.name"
-            placeholder="請輸入作業名稱"
+            :placeholder="$t('activity.namePlaceholder')"
             class="inline-input"
             size="small"
             ref="nameInputRef"
@@ -56,8 +56,8 @@
       <el-table-column prop="normal_duration" :label="''" min-width="140" align="center">
         <template #header>
           <div class="header-label">
-            <span class="main-text">正常工期</span>
-            <span class="sub-text">（天）</span>
+            <span class="main-text">{{ $t('activity.normalDuration') }}</span>
+            <span class="sub-text">{{ $t('common.daysUnit') }}</span>
           </div>
         </template>
         <template #default="{ row }">
@@ -77,8 +77,8 @@
       <el-table-column prop="crash_duration" :label="''" min-width="140" align="center">
         <template #header>
           <div class="header-label">
-            <span class="main-text">趕工工期</span>
-            <span class="sub-text">（天）</span>
+            <span class="main-text">{{ $t('activity.crashDuration') }}</span>
+            <span class="sub-text">{{ $t('common.daysUnit') }}</span>
           </div>
         </template>
         <template #default="{ row }">
@@ -98,8 +98,8 @@
       <el-table-column prop="normal_cost" :label="''" min-width="160" align="center">
         <template #header>
           <div class="header-label">
-            <span class="main-text">正常成本</span>
-            <span class="sub-text">（NT$）</span>
+            <span class="main-text">{{ $t('activity.normalCost') }}</span>
+            <span class="sub-text">{{ $t('common.currencyUnit') }}</span>
           </div>
         </template>
         <template #default="{ row }">
@@ -119,8 +119,8 @@
       <el-table-column prop="crash_cost" :label="''" min-width="160" align="center">
         <template #header>
           <div class="header-label">
-            <span class="main-text">趕工成本</span>
-            <span class="sub-text">（NT$）</span>
+            <span class="main-text">{{ $t('activity.crashCost') }}</span>
+            <span class="sub-text">{{ $t('common.currencyUnit') }}</span>
           </div>
         </template>
         <template #default="{ row }">
@@ -140,8 +140,8 @@
       <el-table-column :label="''" min-width="160" align="center">
         <template #header>
           <div class="header-label">
-            <span class="main-text">前置作業</span>
-            <span class="sub-text">（可多選）</span>
+            <span class="main-text">{{ $t('activity.predecessors') }}</span>
+            <span class="sub-text">{{ $t('activity.multiple') }}</span>
           </div>
         </template>
         <template #default="{ row }">
@@ -149,7 +149,7 @@
             v-if="row.isEditing"
             v-model="row.predecessor_ids"
             multiple
-            placeholder="請選擇"
+            :placeholder="$t('activity.selectPredecessors')"
             class="inline-select"
             size="small"
             :disabled="row.isNew && row.id"
@@ -172,25 +172,25 @@
                 {{ pred.name }}
               </el-tag>
             </template>
-            <span v-else class="empty-text">無</span>
+            <span v-else class="empty-text">{{ $t('activity.noPredecessors') }}</span>
           </div>
         </template>
       </el-table-column>
       <el-table-column :label="''" min-width="140" align="center">
         <template #header>
           <div class="header-label">
-            <span class="main-text">後續作業</span>
-            <span class="sub-text">（系統顯示）</span>
+            <span class="main-text">{{ $t('activity.successors') }}</span>
+            <span class="sub-text">{{ $t('activity.systemDisplay') }}</span>
           </div>
         </template>
         <template #default="{ row }">
-          <span class="cell-text empty-text">無</span>
+          <span class="cell-text empty-text">{{ $t('activity.noPredecessors') }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="''" min-width="120" align="center">
         <template #header>
           <div class="header-label">
-            <span class="main-text">操作</span>
+            <span class="main-text">{{ $t('activity.actions') }}</span>
           </div>
         </template>
         <template #default="{ row }">
@@ -250,12 +250,12 @@
                 <el-input
                   v-if="row.isEditing"
                   v-model="row.name"
-                  placeholder="請輸入作業名稱"
+                  :placeholder="$t('activity.namePlaceholder')"
                   class="inline-input"
                   size="small"
                   @keyup.enter="handleEnterKey(row)"
                 />
-                <span v-else>{{ row.name || '未命名作業' }}</span>
+                <span v-else>{{ row.name || $t('activity.unnamed') }}</span>
               </div>
               <div class="card-actions-inline">
                 <template v-if="row.isEditing">
@@ -299,7 +299,7 @@
             </div>
 
             <div class="card-field">
-              <span class="field-label">正常工期（天）</span>
+              <span class="field-label">{{ $t('activity.normalDuration') }}{{ $t('common.daysUnit') }}</span>
               <div class="field-value">
                 <el-input-number
                   v-if="row.isEditing"
@@ -315,7 +315,7 @@
             </div>
 
             <div class="card-field">
-              <span class="field-label">趕工工期（天）</span>
+              <span class="field-label">{{ $t('activity.crashDuration') }}{{ $t('common.daysUnit') }}</span>
               <div class="field-value">
                 <el-input-number
                   v-if="row.isEditing"
@@ -331,7 +331,7 @@
             </div>
 
             <div class="card-field">
-              <span class="field-label">正常成本（NT$）</span>
+              <span class="field-label">{{ $t('activity.normalCost') }}{{ $t('common.currencyUnit') }}</span>
               <div class="field-value">
                 <el-input-number
                   v-if="row.isEditing"
@@ -347,7 +347,7 @@
             </div>
 
             <div class="card-field">
-              <span class="field-label">趕工成本（NT$）</span>
+              <span class="field-label">{{ $t('activity.crashCost') }}{{ $t('common.currencyUnit') }}</span>
               <div class="field-value">
                 <el-input-number
                   v-if="row.isEditing"
@@ -363,13 +363,13 @@
             </div>
 
             <div class="card-field">
-              <span class="field-label">前置作業</span>
+              <span class="field-label">{{ $t('activity.predecessors') }}</span>
               <div class="field-value">
                 <el-select
                   v-if="row.isEditing"
                   v-model="row.predecessor_ids"
                   multiple
-                  placeholder="請選擇"
+                  :placeholder="$t('activity.selectPredecessors')"
                   class="inline-select"
                   size="small"
                 >
@@ -391,39 +391,39 @@
                       {{ pred.name }}
                     </el-tag>
                   </template>
-                  <span v-else class="empty-text">無</span>
+                  <span v-else class="empty-text">{{ $t('activity.noPredecessors') }}</span>
                 </div>
               </div>
             </div>
 
             <div class="card-field">
-              <span class="field-label">後續作業</span>
+              <span class="field-label">{{ $t('activity.successors') }}</span>
               <div class="field-value">
-                <span class="empty-text">無</span>
+                <span class="empty-text">{{ $t('activity.noPredecessors') }}</span>
               </div>
             </div>
           </div>
         </template>
-        <el-empty v-else description="暫無作業資料" />
+        <el-empty v-else :description="$t('activity.emptyText')" />
       </div>
     </div>
 
     <!-- CSV 匯入對話框 -->
     <el-dialog
       v-model="showImportDialog"
-      title="CSV 匯入作業"
+      :title="$t('activity.csvImportDialog.title')"
       width="600px"
       class="import-dialog"
       @close="handleImportDialogClose"
     >
       <div class="import-content">
         <div class="import-instructions">
-          <h3>匯入說明</h3>
+          <h3>{{ $t('activity.csvImportDialog.instructionsTitle') }}</h3>
           <ul>
-            <li>CSV 檔案需包含以下欄位：作業名稱、正常工期、正常成本、趕工工期、趕工成本</li>
-            <li>選填欄位：描述、前置作業（多個前置作業請用逗號分隔作業名稱）</li>
-            <li>第一行為標題列，系統會自動識別欄位名稱</li>
-            <li>支援 UTF-8 和 Big5 編碼</li>
+            <li>{{ $t('activity.csvImportDialog.instruction1') }}</li>
+            <li>{{ $t('activity.csvImportDialog.instruction2') }}</li>
+            <li>{{ $t('activity.csvImportDialog.instruction3') }}</li>
+            <li>{{ $t('activity.csvImportDialog.instruction4') }}</li>
           </ul>
           <el-button 
             type="primary" 
@@ -433,7 +433,7 @@
             size="small"
           >
             <el-icon><Download /></el-icon>
-            下載 CSV 範本
+            {{ $t('activity.csvImportDialog.downloadTemplate') }}
           </el-button>
         </div>
         
@@ -448,30 +448,30 @@
         >
           <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
           <div class="el-upload__text">
-            將 CSV 檔案拖到此處，或<em>點擊上傳</em>
+            {{ $t('activity.csvImportDialog.dragText') }}<em>{{ $t('activity.csvImportDialog.clickText') }}</em>
           </div>
           <template #tip>
             <div class="el-upload__tip">
-              僅支援 CSV 檔案格式
+              {{ $t('activity.csvImportDialog.fileFormatTip') }}
             </div>
           </template>
         </el-upload>
 
         <div v-if="importPreview.length > 0" class="import-preview">
-          <h4>預覽資料（前 5 筆）</h4>
+          <h4>{{ $t('activity.csvImportDialog.previewTitle') }}</h4>
           <el-table :data="importPreview" border size="small" max-height="200">
-            <el-table-column prop="name" label="作業名稱" width="150" />
-            <el-table-column prop="normal_duration" label="正常工期" width="100" />
-            <el-table-column prop="normal_cost" label="正常成本" width="120" />
-            <el-table-column prop="crash_duration" label="趕工工期" width="100" />
-            <el-table-column prop="crash_cost" label="趕工成本" width="120" />
-            <el-table-column prop="predecessors" label="前置作業" />
+            <el-table-column prop="name" :label="$t('activity.name')" width="150" />
+            <el-table-column prop="normal_duration" :label="$t('activity.normalDuration')" width="100" />
+            <el-table-column prop="normal_cost" :label="$t('activity.normalCost')" width="120" />
+            <el-table-column prop="crash_duration" :label="$t('activity.crashDuration')" width="100" />
+            <el-table-column prop="crash_cost" :label="$t('activity.crashCost')" width="120" />
+            <el-table-column prop="predecessors" :label="$t('activity.predecessors')" />
           </el-table>
-          <p class="preview-total">共 {{ importData.length }} 筆資料</p>
+          <p class="preview-total">{{ $t('activity.csvImportDialog.totalRecords', { count: importData.length }) }}</p>
         </div>
 
         <div v-if="importErrors.length > 0" class="import-errors">
-          <h4>錯誤訊息</h4>
+          <h4>{{ $t('activity.csvImportDialog.errorTitle') }}</h4>
           <el-alert
             v-for="(error, index) in importErrors"
             :key="index"
@@ -484,7 +484,7 @@
       </div>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="showImportDialog = false" class="cancel-btn">取消</el-button>
+          <el-button @click="showImportDialog = false" class="cancel-btn">{{ $t('common.cancel') }}</el-button>
           <el-button 
             type="primary" 
             @click="handleImport" 
@@ -492,7 +492,7 @@
             :disabled="importData.length === 0"
             class="submit-btn"
           >
-            開始匯入
+            {{ $t('activity.csvImportDialog.startImport') }}
           </el-button>
         </div>
       </template>
@@ -501,7 +501,7 @@
     <!-- 建立/編輯作業對話框 -->
     <el-dialog
       v-model="showCreateDialog"
-      :title="editingActivity ? '編輯作業' : '新增作業'"
+      :title="editingActivity ? $t('activity.dialogTitle.edit') : $t('activity.dialogTitle.create')"
       width="680px"
       class="activity-dialog"
       @close="handleDialogClose"
@@ -514,76 +514,76 @@
         class="activity-form"
       >
         <div class="form-section">
-          <div class="section-title">基本資訊</div>
-          <el-form-item label="作業名稱" prop="name">
+          <div class="section-title">{{ $t('activity.formSection.basic') }}</div>
+          <el-form-item :label="$t('activity.name')" prop="name">
             <el-input 
               v-model="activityForm.name" 
-              placeholder="請輸入作業名稱"
+              :placeholder="$t('activity.namePlaceholder')"
               class="form-input"
             />
           </el-form-item>
-          <el-form-item label="描述">
+          <el-form-item :label="$t('activity.description')">
             <el-input
               v-model="activityForm.description"
               type="textarea"
               :rows="3"
-              placeholder="請輸入作業描述（選填）"
+              :placeholder="$t('activity.placeholder.description')"
               class="form-textarea"
             />
           </el-form-item>
         </div>
 
         <div class="form-section">
-          <div class="section-title">正常作業</div>
-          <el-form-item label="正常工期（天）" prop="normal_duration">
+          <div class="section-title">{{ $t('activity.formSection.normal') }}</div>
+          <el-form-item :label="$t('activity.normalDuration') + $t('common.daysUnit')" prop="normal_duration">
             <el-input-number
               v-model="activityForm.normal_duration"
               :min="1"
               :precision="0"
               class="form-input-number"
-              placeholder="請輸入正常工期"
+              :placeholder="$t('activity.placeholder.normalDuration')"
             />
           </el-form-item>
-          <el-form-item label="正常成本" prop="normal_cost">
+          <el-form-item :label="$t('activity.normalCost')" prop="normal_cost">
             <el-input-number
               v-model="activityForm.normal_cost"
               :min="0"
               :precision="2"
               class="form-input-number"
-              placeholder="請輸入正常成本"
+              :placeholder="$t('activity.placeholder.normalCost')"
             />
           </el-form-item>
         </div>
 
         <div class="form-section">
-          <div class="section-title">趕工作業</div>
-          <el-form-item label="趕工工期（天）" prop="crash_duration">
+          <div class="section-title">{{ $t('activity.formSection.crash') }}</div>
+          <el-form-item :label="$t('activity.crashDuration') + $t('common.daysUnit')" prop="crash_duration">
             <el-input-number
               v-model="activityForm.crash_duration"
               :min="1"
               :precision="0"
               class="form-input-number"
-              placeholder="請輸入趕工工期"
+              :placeholder="$t('activity.placeholder.crashDuration')"
             />
           </el-form-item>
-          <el-form-item label="趕工成本" prop="crash_cost">
+          <el-form-item :label="$t('activity.crashCost')" prop="crash_cost">
             <el-input-number
               v-model="activityForm.crash_cost"
               :min="0"
               :precision="2"
               class="form-input-number"
-              placeholder="請輸入趕工成本"
+              :placeholder="$t('activity.placeholder.crashCost')"
             />
           </el-form-item>
         </div>
 
         <div class="form-section">
-          <div class="section-title">作業關係</div>
-          <el-form-item label="前置作業">
+          <div class="section-title">{{ $t('activity.formSection.relationship') }}</div>
+          <el-form-item :label="$t('activity.predecessors')">
             <el-select
               v-model="activityForm.predecessor_ids"
               multiple
-              placeholder="請選擇前置作業（選填）"
+              :placeholder="$t('activity.placeholder.predecessors')"
               class="form-select"
               :disabled="editingActivity && editingActivity.id"
             >
@@ -599,9 +599,9 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="showCreateDialog = false" class="cancel-btn">取消</el-button>
+          <el-button @click="showCreateDialog = false" class="cancel-btn">{{ $t('common.cancel') }}</el-button>
           <el-button type="primary" @click="saveActivity" :loading="saving" class="submit-btn">
-            確定
+            {{ $t('common.confirm') }}
           </el-button>
         </div>
       </template>
@@ -614,6 +614,9 @@ import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Edit, Delete, Check, Close, Upload, Download, UploadFilled } from '@element-plus/icons-vue'
 import { activityAPI } from '../services/api'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   projectId: {
@@ -693,7 +696,7 @@ const loadActivities = async () => {
       }
     }
   } catch (error) {
-    ElMessage.error('載入作業列表失敗：' + error.message)
+    ElMessage.error(t('activity.loadError', { error: error.message }))
   } finally {
     loading.value = false
   }
@@ -714,13 +717,13 @@ const saveActivity = async () => {
 
     // 驗證趕工工期 <= 正常工期
     if (activityForm.value.crash_duration > activityForm.value.normal_duration) {
-      ElMessage.warning('趕工工期必須小於等於正常工期')
+      ElMessage.warning(t('activity.validationError.crashDurationInvalid'))
       return
     }
-
+    
     // 驗證趕工成本 >= 正常成本
     if (activityForm.value.crash_cost < activityForm.value.normal_cost) {
-      ElMessage.warning('趕工成本必須大於等於正常成本')
+      ElMessage.warning(t('activity.validationError.crashCostInvalid'))
       return
     }
 
@@ -728,16 +731,16 @@ const saveActivity = async () => {
     try {
       if (editingActivity.value) {
         await activityAPI.updateActivity(editingActivity.value.id, activityForm.value)
-        ElMessage.success('作業更新成功')
+        ElMessage.success(t('activity.updateSuccess'))
       } else {
         await activityAPI.createActivity(props.projectId, activityForm.value)
-        ElMessage.success('作業建立成功')
+        ElMessage.success(t('activity.createSuccess'))
       }
       showCreateDialog.value = false
       resetForm()
       loadActivities()
     } catch (error) {
-      ElMessage.error('儲存失敗：' + error.message)
+      ElMessage.error(t('activity.saveError', { error: error.message }))
     } finally {
       saving.value = false
     }
@@ -784,17 +787,17 @@ const handleEnterKey = (row) => {
 // 保存內聯編輯
 const saveInlineActivity = async (row) => {
   if (!row.name || !row.name.trim()) {
-    ElMessage.warning('請輸入作業名稱')
+    ElMessage.warning(t('activity.validationError.nameRequired'))
     return
   }
 
   if (row.crash_duration > row.normal_duration) {
-    ElMessage.warning('趕工工期必須小於等於正常工期')
+    ElMessage.warning(t('activity.validationError.crashDurationInvalid'))
     return
   }
 
   if (row.crash_cost < row.normal_cost) {
-    ElMessage.warning('趕工成本必須大於等於正常成本')
+    ElMessage.warning(t('activity.validationError.crashCostInvalid'))
     return
   }
 
@@ -823,7 +826,7 @@ const saveInlineActivity = async (row) => {
           isNew: false
         }
       }
-      ElMessage.success('作業建立成功')
+      ElMessage.success(t('activity.createSuccess'))
       isAddingNew.value = false
     } else {
       // 更新
@@ -840,11 +843,11 @@ const saveInlineActivity = async (row) => {
       }
       row.isEditing = false
       row.isNew = false
-      ElMessage.success('作業更新成功')
+      ElMessage.success(t('activity.updateSuccess'))
     }
     loadActivities()
   } catch (error) {
-    ElMessage.error('儲存失敗：' + error.message)
+    ElMessage.error(t('activity.saveError', { error: error.message }))
   } finally {
     saving.value = false
     editingRow.value = null
@@ -899,16 +902,16 @@ const availablePredecessorsForEdit = (currentRow) => {
 const deleteActivity = async (activity) => {
   try {
     await ElMessageBox.confirm(
-      `確定要刪除作業「${activity.name}」嗎？`,
-      '確認刪除',
+      t('activity.deleteConfirm', { name: activity.name }),
+      t('activity.deleteTitle'),
       { type: 'warning' }
     )
     await activityAPI.deleteActivity(activity.id)
-    ElMessage.success('作業已刪除')
+    ElMessage.success(t('activity.deleteSuccess'))
     loadActivities()
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('刪除失敗：' + error.message)
+      ElMessage.error(t('activity.deleteError', { error: error.message }))
     }
   }
 }
@@ -984,8 +987,8 @@ const handleFileChange = (file) => {
       const text = e.target.result
       parseCSV(text)
     } catch (error) {
-      ElMessage.error('讀取檔案失敗：' + error.message)
-      importErrors.value.push('讀取檔案失敗：' + error.message)
+      ElMessage.error(t('activity.csvImportDialog.parseError', { error: error.message }))
+      importErrors.value.push(t('activity.csvImportDialog.parseError', { error: error.message }))
     }
   }
   
@@ -1098,13 +1101,13 @@ const parseCSV = (text) => {
     }))
     
     if (activities.length === 0) {
-      ElMessage.warning('未找到有效的作業資料')
+      ElMessage.warning(t('activity.csvImportDialog.noValidData'))
     } else {
-      ElMessage.success(`成功解析 ${activities.length} 筆作業資料`)
+      ElMessage.success(t('activity.csvImportDialog.parseSuccess', { count: activities.length }))
     }
   } catch (error) {
-    ElMessage.error('解析 CSV 失敗：' + error.message)
-    importErrors.value.push('解析 CSV 失敗：' + error.message)
+    ElMessage.error(t('activity.csvImportDialog.parseError', { error: error.message }))
+    importErrors.value.push(t('activity.csvImportDialog.parseError', { error: error.message }))
   }
 }
 
@@ -1155,7 +1158,7 @@ const downloadTemplate = () => {
 // 處理匯入
 const handleImport = async () => {
   if (importData.value.length === 0) {
-    ElMessage.warning('沒有可匯入的資料')
+    ElMessage.warning(t('activity.csvImportDialog.noFile'))
     return
   }
   
@@ -1211,19 +1214,22 @@ const handleImport = async () => {
         nameToIdMap.set(activity.name, created.id)
       } catch (error) {
         failCount++
-        importErrors.value.push(`匯入「${activity.name}」失敗：${error.message}`)
+        importErrors.value.push(t('activity.csvImportDialog.importItemError', { name: activity.name, error: error.message }))
       }
     }
     
     if (successCount > 0) {
-      ElMessage.success(`成功匯入 ${successCount} 筆作業${failCount > 0 ? `，${failCount} 筆失敗` : ''}`)
+      const message = failCount > 0 
+        ? t('activity.csvImportDialog.importSuccessWithFail', { successCount, failCount })
+        : t('activity.csvImportDialog.importSuccess', { count: successCount })
+      ElMessage.success(message)
       showImportDialog.value = false
       loadActivities()
     } else {
-      ElMessage.error('所有作業匯入失敗')
+      ElMessage.error(t('activity.csvImportDialog.importAllFailed'))
     }
   } catch (error) {
-    ElMessage.error('匯入過程發生錯誤：' + error.message)
+    ElMessage.error(t('activity.csvImportDialog.importError', { error: error.message }))
   } finally {
     importing.value = false
   }

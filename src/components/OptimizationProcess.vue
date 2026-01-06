@@ -3,45 +3,44 @@
     <el-card class="process-card">
       <template #header>
         <div class="card-header">
-          <h2 class="card-title">最佳化計算過程說明</h2>
+          <h2 class="card-title">{{ $t('optimizationProcess.title') }}</h2>
         </div>
       </template>
 
       <!-- 問題類型說明 -->
       <div class="section">
-        <h3 class="section-title">一、問題類型</h3>
+        <h3 class="section-title">{{ $t('optimizationProcess.problemType.title') }}</h3>
         <div class="content-box">
-          <p><strong>混合整數線性規劃（Mixed Integer Linear Programming, MILP）</strong></p>
+          <p><strong>{{ $t('optimizationProcess.problemType.milp') }}</strong></p>
           <p class="description">
-            本系統使用 MILP 求解營造專案的最佳化決策問題。MILP 是一種數學優化方法，
-            其中部分變數限制為整數（如開始時間、工期），部分變數為 0/1 二元變數（如是否趕工）。
+            {{ $t('optimizationProcess.problemType.description') }}
           </p>
         </div>
       </div>
 
       <!-- 優化模式 -->
       <div class="section">
-        <h3 class="section-title">二、優化模式</h3>
+        <h3 class="section-title">{{ $t('optimizationProcess.mode.title') }}</h3>
         <div class="content-box">
           <div class="mode-badge" :class="`mode-${optimizationData.mode}`">
-            {{ optimizationData.mode === 'budget_to_duration' ? '模式一：給定預算，求最短工期' : '模式二：給定工期，求最低成本' }}
+            {{ optimizationData.mode === 'budget_to_duration' ? $t('optimizationProcess.mode.budgetToDuration') : $t('optimizationProcess.mode.durationToCost') }}
           </div>
           <div class="constraints-list">
             <div v-if="optimizationData.mode === 'budget_to_duration'" class="constraint-item">
-              <span class="constraint-label">預算約束：</span>
+              <span class="constraint-label">{{ $t('optimizationProcess.mode.budgetConstraint') }}</span>
               <span class="constraint-value">{{ formatCurrency(optimizationData.budget_constraint) }}</span>
             </div>
             <div v-else class="constraint-item">
-              <span class="constraint-label">工期約束：</span>
-              <span class="constraint-value">{{ optimizationData.duration_constraint }} 天</span>
+              <span class="constraint-label">{{ $t('optimizationProcess.mode.durationConstraint') }}</span>
+              <span class="constraint-value">{{ optimizationData.duration_constraint }} {{ $t('common.days') }}</span>
             </div>
             <div v-if="optimizationData.indirect_cost" class="constraint-item">
-              <span class="constraint-label">間接成本：</span>
-              <span class="constraint-value">{{ formatCurrency(optimizationData.indirect_cost) }} / 天</span>
+              <span class="constraint-label">{{ $t('optimizationProcess.mode.indirectCost') }}</span>
+              <span class="constraint-value">{{ formatCurrency(optimizationData.indirect_cost) }}{{ $t('optimizationProcess.mode.perDay') }}</span>
             </div>
             <div v-if="optimizationData.target_duration" class="constraint-item">
-              <span class="constraint-label">目標工期：</span>
-              <span class="constraint-value">{{ optimizationData.target_duration }} 天</span>
+              <span class="constraint-label">{{ $t('optimizationProcess.mode.targetDuration') }}</span>
+              <span class="constraint-value">{{ optimizationData.target_duration }} {{ $t('common.days') }}</span>
             </div>
           </div>
         </div>
@@ -49,64 +48,64 @@
 
       <!-- 數學模型 -->
       <div class="section">
-        <h3 class="section-title">三、MILP 數學模型</h3>
+        <h3 class="section-title">{{ $t('optimizationProcess.model.title') }}</h3>
         
         <!-- 決策變數 -->
         <div class="subsection">
-          <h4 class="subsection-title">3.1 決策變數</h4>
+          <h4 class="subsection-title">{{ $t('optimizationProcess.model.variables.title') }}</h4>
           <div class="formula-box">
             <div class="formula-item">
               <span class="formula-var">x<sub>i</sub></span>
-              <span class="formula-desc">：作業 i 的開始時間（整數變數，單位：天）</span>
+              <span class="formula-desc">{{ $t('optimizationProcess.model.variables.xi') }}</span>
             </div>
             <div class="formula-item">
               <span class="formula-var">y<sub>i</sub></span>
-              <span class="formula-desc">：作業 i 是否趕工（二元變數，0 = 正常施工，1 = 趕工）</span>
+              <span class="formula-desc">{{ $t('optimizationProcess.model.variables.yi') }}</span>
             </div>
             <div class="formula-item">
               <span class="formula-var">T</span>
-              <span class="formula-desc">：專案總工期（整數變數，單位：天）</span>
+              <span class="formula-desc">{{ $t('optimizationProcess.model.variables.t') }}</span>
             </div>
           </div>
           <div class="variable-details">
-            <p><strong>變數總數：</strong></p>
+            <p><strong>{{ $t('optimizationProcess.model.variables.totalCount') }}</strong></p>
             <ul>
-              <li>連續/整數變數：{{ activities.length + 1 }} 個（{{ activities.length }} 個作業開始時間 + 1 個總工期）</li>
-              <li>二元變數：{{ activities.length }} 個（每個作業的趕工決策）</li>
+              <li>{{ $t('optimizationProcess.model.variables.continuous', { count: activities.length + 1, activityCount: activities.length }) }}</li>
+              <li>{{ $t('optimizationProcess.model.variables.binary', { count: activities.length }) }}</li>
             </ul>
           </div>
         </div>
 
         <!-- 目標函數 -->
         <div class="subsection">
-          <h4 class="subsection-title">3.2 目標函數</h4>
+          <h4 class="subsection-title">{{ $t('optimizationProcess.model.objective.title') }}</h4>
           <div class="formula-box">
             <div v-if="optimizationData.mode === 'budget_to_duration'" class="objective-formula">
               <div class="formula-line">
-                <strong>目標：</strong> min Z = T + P - B
+                <strong>{{ $t('optimizationProcess.model.objective.minimize') }}</strong> min Z = T + P - B
               </div>
               <div class="formula-explanation">
-                <p>其中：</p>
+                <p>{{ $t('optimizationProcess.model.objective.explanation') }}</p>
                 <ul>
                   <li>
-                    <strong>T</strong>：專案總工期
-                    <span class="calc-value"> = {{ result.optimal_duration }} 天</span>
+                    <strong>T</strong>：{{ $t('optimizationProcess.model.objective.totalDuration') }}
+                    <span class="calc-value"> = {{ result.optimal_duration }} {{ $t('common.days') }}</span>
                   </li>
                   <li>
-                    <strong>P</strong>：違約金（若 T > 目標工期）
+                    <strong>P</strong>：{{ $t('optimizationProcess.model.objective.penalty') }}
                     <span class="calc-value"> = {{ formatCurrency(result.penalty_amount) }}</span>
                   </li>
                   <li>
-                    <strong>B</strong>：趕工獎金（若 T < 目標工期）
+                    <strong>B</strong>：{{ $t('optimizationProcess.model.objective.bonus') }}
                     <span class="calc-value"> = {{ formatCurrency(result.bonus_amount) }}</span>
                   </li>
                 </ul>
                 <div class="total-calc">
-                  <strong>總目標值：</strong>
-                  {{ result.optimal_duration }} 天 + {{ formatCurrency(result.penalty_amount) }} 
+                  <strong>{{ $t('optimizationProcess.model.objective.totalObjective') }}</strong>
+                  {{ result.optimal_duration }} {{ $t('common.days') }} + {{ formatCurrency(result.penalty_amount) }} 
                   - {{ formatCurrency(result.bonus_amount) }}
                   <br>
-                  <strong>總成本（含獎懲）：</strong>
+                  <strong>{{ $t('optimizationProcess.model.objective.totalCostWithPenalty') }}</strong>
                   {{ formatCurrency(result.optimal_cost) }} + {{ formatCurrency(result.indirect_cost) }} 
                   + {{ formatCurrency(result.penalty_amount) }} - {{ formatCurrency(result.bonus_amount) }}
                   = <span class="highlight">{{ formatCurrency(result.total_cost) }}</span>
@@ -115,30 +114,30 @@
             </div>
             <div v-else class="objective-formula">
               <div class="formula-line">
-                <strong>目標：</strong> min Z = C<sub>直接</sub> + C<sub>間接</sub> + P - B
+                <strong>{{ $t('optimizationProcess.model.objective.minimize') }}</strong> min Z = C<sub>{{ $t('optimizationProcess.model.objective.directCost') }}</sub> + C<sub>{{ $t('optimizationProcess.model.objective.indirectCost') }}</sub> + P - B
               </div>
               <div class="formula-explanation">
-                <p>其中：</p>
+                <p>{{ $t('optimizationProcess.model.objective.explanation') }}</p>
                 <ul>
                   <li>
-                    <strong>C<sub>直接</sub></strong> = Σ [c<sub>i,正常</sub> × (1 - y<sub>i</sub>) + c<sub>i,趕工</sub> × y<sub>i</sub>]
+                    <strong>C<sub>{{ $t('optimizationProcess.model.objective.directCost') }}</sub></strong> = Σ [c<sub>i,正常</sub> × (1 - y<sub>i</sub>) + c<sub>i,趕工</sub> × y<sub>i</sub>]
                     <span class="calc-value"> = {{ formatCurrency(result.optimal_cost) }}</span>
                   </li>
                   <li>
-                    <strong>C<sub>間接</sub></strong> = 間接成本率 × T = {{ formatCurrency(optimizationData.indirect_cost) }} × {{ result.optimal_duration }}
+                    <strong>C<sub>{{ $t('optimizationProcess.model.objective.indirectCost') }}</sub></strong> = {{ $t('optimizationProcess.mode.indirectCost') }} × T = {{ formatCurrency(optimizationData.indirect_cost) }} × {{ result.optimal_duration }}
                     <span class="calc-value"> = {{ formatCurrency(result.indirect_cost) }}</span>
                   </li>
                   <li>
-                    <strong>P</strong>：違約金 
+                    <strong>P</strong>：{{ $t('optimizationProcess.model.objective.penalty') }}
                     <span class="calc-value"> = {{ formatCurrency(result.penalty_amount) }}</span>
                   </li>
                   <li>
-                    <strong>B</strong>：趕工獎金 
+                    <strong>B</strong>：{{ $t('optimizationProcess.model.objective.bonus') }}
                     <span class="calc-value"> = {{ formatCurrency(result.bonus_amount) }}</span>
                   </li>
                 </ul>
                 <div class="total-calc">
-                  <strong>總目標值：</strong>
+                  <strong>{{ $t('optimizationProcess.model.objective.totalObjective') }}</strong>
                   {{ formatCurrency(result.optimal_cost) }} + {{ formatCurrency(result.indirect_cost) }} 
                   + {{ formatCurrency(result.penalty_amount) }} - {{ formatCurrency(result.bonus_amount) }}
                   = <span class="highlight">{{ formatCurrency(result.total_cost) }}</span>
@@ -150,28 +149,29 @@
 
         <!-- 限制式 -->
         <div class="subsection">
-          <h4 class="subsection-title">3.3 限制式</h4>
+          <h4 class="subsection-title">{{ $t('optimizationProcess.model.constraints.title') }}</h4>
           <div class="constraints-box">
             <div class="constraint-group">
               <div class="constraint-title">
                 <el-icon><Check /></el-icon>
-                前置作業約束（共 {{ precedences.length }} 條）
+                {{ $t('optimizationProcess.model.constraints.precedence.title', { count: precedences.length }) }}
               </div>
               <div class="constraint-formula">
-                x<sub>j</sub> ≥ x<sub>i</sub> + d<sub>i</sub>, ∀ (i, j) ∈ 前置關係
+                {{ $t('optimizationProcess.model.constraints.precedence.formula') }}
               </div>
               <div class="constraint-desc">
-                其中 d<sub>i</sub> = d<sub>i,正常</sub> × (1 - y<sub>i</sub>) + d<sub>i,趕工</sub> × y<sub>i</sub>
-                <br>
-                <em>說明：後續作業 j 的開始時間必須 ≥ 前置作業 i 的結束時間</em>
+                <em>{{ $t('optimizationProcess.model.constraints.precedence.description') }}</em>
               </div>
               <div v-if="precedences.length > 0" class="constraint-example">
-                <strong>範例：</strong>
+                <strong>{{ $t('optimizationProcess.model.constraints.precedence.example') }}</strong>
                 <div v-for="(prec, idx) in precedences.slice(0, 3)" :key="idx" class="example-item">
-                  {{ getActivityName(prec.successor) }} 必須在 {{ getActivityName(prec.predecessor) }} 完成後才能開始
+                  {{ $t('optimizationProcess.model.constraints.precedence.exampleItem', { 
+                    successor: getActivityName(prec.successor), 
+                    predecessor: getActivityName(prec.predecessor) 
+                  }) }}
                 </div>
                 <div v-if="precedences.length > 3" class="more-info">
-                  ...等共 {{ precedences.length }} 條前置關係
+                  {{ $t('optimizationProcess.model.constraints.precedence.more', { count: precedences.length }) }}
                 </div>
               </div>
             </div>
@@ -179,52 +179,52 @@
             <div class="constraint-group">
               <div class="constraint-title">
                 <el-icon><Check /></el-icon>
-                工期定義約束（共 {{ activities.length }} 條）
+                {{ $t('optimizationProcess.model.constraints.duration.title', { count: activities.length }) }}
               </div>
               <div class="constraint-formula">
-                T ≥ x<sub>i</sub> + d<sub>i</sub>, ∀ i ∈ 作業集合
+                {{ $t('optimizationProcess.model.constraints.duration.formula') }}
               </div>
               <div class="constraint-desc">
-                <em>說明：專案總工期必須 ≥ 所有作業的結束時間</em>
+                <em>{{ $t('optimizationProcess.model.constraints.duration.description') }}</em>
               </div>
             </div>
 
             <div v-if="optimizationData.mode === 'budget_to_duration'" class="constraint-group">
               <div class="constraint-title">
                 <el-icon><Check /></el-icon>
-                預算約束
+                {{ $t('optimizationProcess.model.constraints.budget.title') }}
               </div>
               <div class="constraint-formula">
-                C<sub>直接</sub> + C<sub>間接</sub> ≤ {{ formatCurrency(optimizationData.budget_constraint) }}
+                C<sub>{{ $t('optimizationProcess.model.objective.directCost') }}</sub> + C<sub>{{ $t('optimizationProcess.model.objective.indirectCost') }}</sub> ≤ {{ formatCurrency(optimizationData.budget_constraint) }}
               </div>
               <div class="constraint-desc">
-                <em>說明：直接成本 + 間接成本不得超過預算</em>
+                <em>{{ $t('optimizationProcess.model.constraints.budget.description') }}</em>
               </div>
             </div>
 
             <div v-else class="constraint-group">
               <div class="constraint-title">
                 <el-icon><Check /></el-icon>
-                工期約束（工期固定）
+                {{ $t('optimizationProcess.model.constraints.fixedDuration.title') }}
               </div>
               <div class="constraint-formula">
-                T = {{ optimizationData.duration_constraint }} 天
+                T = {{ optimizationData.duration_constraint }} {{ $t('common.days') }}
               </div>
               <div class="constraint-desc">
-                <em>說明：在「工期固定」模式中，專案總工期 T 會被嚴格固定為您輸入的工期值</em>
+                <em>{{ $t('optimizationProcess.model.constraints.fixedDuration.description') }}</em>
               </div>
             </div>
 
             <div class="constraint-group">
               <div class="constraint-title">
                 <el-icon><Check /></el-icon>
-                變數範圍約束
+                {{ $t('optimizationProcess.model.constraints.bounds.title') }}
               </div>
               <div class="constraint-formula">
-                x<sub>i</sub> ≥ 0, y<sub>i</sub> ∈ {0, 1}, T ≥ 0
+                {{ $t('optimizationProcess.model.constraints.bounds.formula') }}
               </div>
               <div class="constraint-desc">
-                <em>說明：開始時間與工期為非負整數，趕工決策為二元變數</em>
+                <em>{{ $t('optimizationProcess.model.constraints.bounds.description') }}</em>
               </div>
             </div>
           </div>
@@ -233,15 +233,17 @@
 
       <!-- 求解過程 -->
       <div class="section">
-        <h3 class="section-title">四、求解過程</h3>
+        <h3 class="section-title">{{ $t('optimizationProcess.solving.title') }}</h3>
         <div class="solve-steps">
           <div class="step-item">
             <div class="step-number">1</div>
             <div class="step-content">
-              <div class="step-title">建立 MILP 模型</div>
+              <div class="step-title">{{ $t('optimizationProcess.solving.step1.title') }}</div>
               <div class="step-desc">
-                根據上述數學模型，系統建立包含 {{ activities.length * 2 + 1 }} 個變數、
-                {{ precedences.length + activities.length + 1 }} 條以上限制式的 MILP 問題
+                {{ $t('optimizationProcess.solving.step1.description', { 
+                  varCount: activities.length * 2 + 1, 
+                  constraintCount: precedences.length + activities.length + 1 
+                }) }}
               </div>
             </div>
           </div>
@@ -249,10 +251,9 @@
           <div class="step-item">
             <div class="step-number">2</div>
             <div class="step-content">
-              <div class="step-title">調用 CBC 求解器</div>
+              <div class="step-title">{{ $t('optimizationProcess.solving.step2.title') }}</div>
               <div class="step-desc">
-                使用 COIN-OR Branch and Cut (CBC) 求解器進行求解。
-                CBC 是一個開源的 MILP 求解器，採用分支定界法（Branch-and-Bound）與割平面法（Cutting Plane）求解整數規劃問題
+                {{ $t('optimizationProcess.solving.step2.description') }}
               </div>
             </div>
           </div>
@@ -260,10 +261,9 @@
           <div class="step-item">
             <div class="step-number">3</div>
             <div class="step-content">
-              <div class="step-title">搜尋最優解</div>
+              <div class="step-title">{{ $t('optimizationProcess.solving.step3.title') }}</div>
               <div class="step-desc">
-                求解器探索可行解空間，透過線性鬆弛（Linear Relaxation）與分支策略，
-                逐步縮小搜尋範圍，尋找滿足所有限制式且目標函數值最小的解
+                {{ $t('optimizationProcess.solving.step3.description') }}
               </div>
             </div>
           </div>
@@ -271,10 +271,9 @@
           <div class="step-item">
             <div class="step-number">4</div>
             <div class="step-content">
-              <div class="step-title">驗證最優性</div>
+              <div class="step-title">{{ $t('optimizationProcess.solving.step4.title') }}</div>
               <div class="step-desc">
-                當求解器找到一個可行解，且能證明該解的目標值不可能再改善時，
-                即確認為全局最優解（Global Optimum）
+                {{ $t('optimizationProcess.solving.step4.description') }}
               </div>
             </div>
           </div>
@@ -282,13 +281,13 @@
           <div class="step-item">
             <div class="step-number">5</div>
             <div class="step-content">
-              <div class="step-title">提取最優解</div>
+              <div class="step-title">{{ $t('optimizationProcess.solving.step5.title') }}</div>
               <div class="step-desc">
-                從求解器提取各決策變數的最優值：
+                {{ $t('optimizationProcess.solving.step5.description') }}
                 <ul>
-                  <li>每個作業的開始時間 x<sub>i</sub>*</li>
-                  <li>每個作業是否趕工 y<sub>i</sub>*</li>
-                  <li>專案總工期 T*</li>
+                  <li>{{ $t('optimizationProcess.solving.step5.items[0]') }}</li>
+                  <li>{{ $t('optimizationProcess.solving.step5.items[1]') }}</li>
+                  <li>{{ $t('optimizationProcess.solving.step5.items[2]') }}</li>
                 </ul>
               </div>
             </div>
@@ -297,13 +296,13 @@
           <div class="step-item">
             <div class="step-number">6</div>
             <div class="step-content">
-              <div class="step-title">計算結果指標</div>
+              <div class="step-title">{{ $t('optimizationProcess.solving.step6.title') }}</div>
               <div class="step-desc">
-                根據最優解計算各項成本與獎懲：
+                {{ $t('optimizationProcess.solving.step6.description') }}
                 <ul>
-                  <li>直接成本 = Σ [選定的作業成本]</li>
-                  <li>間接成本 = 間接成本率 × T*</li>
-                  <li>違約金/獎金（根據實際工期與目標工期比較）</li>
+                  <li>{{ $t('optimizationProcess.solving.step6.items[0]') }}</li>
+                  <li>{{ $t('optimizationProcess.solving.step6.items[1]') }}</li>
+                  <li>{{ $t('optimizationProcess.solving.step6.items[2]') }}</li>
                 </ul>
               </div>
             </div>
@@ -314,81 +313,81 @@
         <div class="solve-result">
           <el-icon><Clock /></el-icon>
           <span class="result-text">
-            求解完成時間：<strong>{{ (result.calculation_time * 1000).toFixed(2) }} 毫秒</strong>
+            {{ $t('optimizationProcess.solving.completionTime') }}<strong>{{ (result.calculation_time * 1000).toFixed(2) }} {{ $t('optimizationProcess.solving.milliseconds') }}</strong>
           </span>
         </div>
       </div>
 
       <!-- 最優解詳細結果 -->
       <div class="section">
-        <h3 class="section-title">五、最優解詳細結果</h3>
+        <h3 class="section-title">{{ $t('optimizationProcess.results.title') }}</h3>
         
         <!-- 工期結果 -->
         <div class="result-box">
           <div class="result-item primary">
-            <span class="result-label">最優工期（T*）</span>
-            <span class="result-value">{{ result.optimal_duration }} 天</span>
+            <span class="result-label">{{ $t('optimizationProcess.results.optimalDuration') }}</span>
+            <span class="result-value">{{ result.optimal_duration }} {{ $t('common.days') }}</span>
           </div>
           <div class="result-item">
-            <span class="result-label">直接成本</span>
+            <span class="result-label">{{ $t('optimizationProcess.results.directCost') }}</span>
             <span class="result-value">{{ formatCurrency(result.optimal_cost) }}</span>
           </div>
           <div class="result-item">
-            <span class="result-label">間接成本</span>
+            <span class="result-label">{{ $t('optimizationProcess.results.indirectCost') }}</span>
             <span class="result-value">{{ formatCurrency(result.indirect_cost) }}</span>
           </div>
           <div class="result-item">
-            <span class="result-label">違約金</span>
+            <span class="result-label">{{ $t('optimizationProcess.results.penalty') }}</span>
             <span class="result-value">{{ formatCurrency(result.penalty_amount) }}</span>
           </div>
           <div class="result-item">
-            <span class="result-label">趕工獎金</span>
+            <span class="result-label">{{ $t('optimizationProcess.results.bonus') }}</span>
             <span class="result-value">{{ formatCurrency(result.bonus_amount) }}</span>
           </div>
           <div class="result-item total">
-            <span class="result-label">總成本（含獎懲）</span>
+            <span class="result-label">{{ $t('optimizationProcess.results.totalCost') }}</span>
             <span class="result-value">{{ formatCurrency(result.total_cost) }}</span>
           </div>
         </div>
 
         <!-- 作業趕工決策 -->
         <div class="decision-table">
-          <h4 class="subsection-title">5.1 作業趕工決策（y<sub>i</sub>*）</h4>
+          <h4 class="subsection-title">{{ $t('optimizationProcess.results.decisions.title') }}</h4>
           <div class="stats-row">
             <div class="stat-item">
-              <span class="stat-label">正常施工：</span>
-              <span class="stat-value">{{ normalCount }} 項作業</span>
+              <span class="stat-label">{{ $t('optimizationProcess.results.decisions.normal') }}</span>
+              <span class="stat-value">{{ normalCount }} {{ $t('optimizationProcess.results.decisions.activities') }}</span>
             </div>
             <div class="stat-item">
-              <span class="stat-label">趕工：</span>
-              <span class="stat-value">{{ crashedCount }} 項作業</span>
+              <span class="stat-label">{{ $t('optimizationProcess.results.decisions.crashed') }}</span>
+              <span class="stat-value">{{ crashedCount }} {{ $t('optimizationProcess.results.decisions.activities') }}</span>
             </div>
           </div>
           <el-table :data="schedules" stripe border class="schedule-table">
-            <el-table-column prop="activity_name" label="作業名稱" width="200" />
-            <el-table-column label="開始時間（x_i*）" width="120" align="center">
+            <el-table-column prop="activity_name" :label="$t('optimizationProcess.results.decisions.activityName')" width="200" />
+            <el-table-column :label="$t('optimizationProcess.results.decisions.startTime')" width="120" align="center">
               <template #default="{ row }">
-                第 {{ row.start_time }} 天
+                {{ $t('optimizationProcess.results.decisions.day', { day: row.start_time }) }}
               </template>
             </el-table-column>
-            <el-table-column label="結束時間" width="120" align="center">
+            <el-table-column :label="$t('optimizationProcess.results.decisions.endTime')" width="120" align="center">
               <template #default="{ row }">
-                第 {{ row.end_time }} 天
+                {{ $t('optimizationProcess.results.decisions.day', { day: row.end_time }) }}
               </template>
             </el-table-column>
-            <el-table-column label="工期（d_i*）" width="100" align="center">
+            <el-table-column :label="$t('optimizationProcess.results.decisions.duration')" width="100" align="center">
               <template #default="{ row }">
-                {{ row.duration }} 天
+                {{ $t('optimizationProcess.results.decisions.days', { days: row.duration }) }}
               </template>
             </el-table-column>
-            <el-table-column label="趕工決策（y_i*）" width="130" align="center">
+            <el-table-column :label="$t('optimizationProcess.results.decisions.decision')" width="130" align="center">
               <template #default="{ row }">
                 <el-tag :type="row.is_crashed ? 'warning' : 'success'" class="decision-tag">
-                  {{ row.is_crashed ? '1（趕工）' : '0（正常）' }}
+                  {{ row.is_crashed ? $t('optimizationProcess.results.decisions.decisionCrashed') : $t('optimizationProcess.results.decisions.decisionNormal') }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="作業成本" align="right">
+            <el-table-column :label="$t('optimizationProcess.results.decisions.cost')" align="right">
               <template #default="{ row }">
                 <span class="cost-text">{{ formatCurrency(row.cost) }}</span>
               </template>
@@ -398,12 +397,12 @@
 
         <!-- 成本計算明細 -->
         <div class="cost-breakdown">
-          <h4 class="subsection-title">5.2 成本計算明細</h4>
+          <h4 class="subsection-title">{{ $t('optimizationProcess.results.breakdown.title') }}</h4>
           <div class="calculation-steps">
             <div class="calc-step">
-              <span class="calc-label">直接成本：</span>
+              <span class="calc-label">{{ $t('optimizationProcess.results.breakdown.directCostLabel') }}</span>
               <span class="calc-formula">
-                Σ [選定作業成本] = 
+                Σ [{{ $t('optimizationProcess.results.breakdown.directCostLabel') }}] = 
                 <template v-for="(schedule, idx) in schedules" :key="schedule.activity_id">
                   {{ formatCurrency(schedule.cost) }}<template v-if="idx < schedules.length - 1"> + </template>
                 </template>
@@ -411,41 +410,41 @@
               </span>
             </div>
             <div class="calc-step">
-              <span class="calc-label">間接成本：</span>
+              <span class="calc-label">{{ $t('optimizationProcess.results.breakdown.indirectCostLabel') }}</span>
               <span class="calc-formula">
-                {{ formatCurrency(optimizationData.indirect_cost) }} × {{ result.optimal_duration }} 天
+                {{ formatCurrency(optimizationData.indirect_cost) }} × {{ result.optimal_duration }} {{ $t('common.days') }}
                 = <strong>{{ formatCurrency(result.indirect_cost) }}</strong>
               </span>
             </div>
             <div v-if="result.penalty_amount > 0" class="calc-step penalty">
-              <span class="calc-label">違約金：</span>
+              <span class="calc-label">{{ $t('optimizationProcess.results.breakdown.penaltyLabel') }}</span>
               <span class="calc-formula">
                 <template v-if="optimizationData.penalty_type === 'fixed' && optimizationData.penalty_amount">
-                  違約金 = 每日定額 × 延遲天數
+                  {{ $t('optimizationProcess.results.breakdown.penaltyFixed') }}
                   <br>
-                  = {{ formatCurrency(optimizationData.penalty_amount) }} × {{ result.optimal_duration - optimizationData.target_duration }} 天
+                  = {{ formatCurrency(optimizationData.penalty_amount) }} × {{ result.optimal_duration - optimizationData.target_duration }} {{ $t('common.days') }}
                 </template>
                 <template v-else-if="optimizationData.penalty_type === 'rate' && optimizationData.penalty_rate">
-                  違約金 = 合約總價 × 違約金率 × 延遲天數
+                  {{ $t('optimizationProcess.results.breakdown.penaltyRate') }}
                   <br>
-                  = {{ formatCurrency(optimizationData.contract_amount) }} × {{ (Number(optimizationData.penalty_rate) * 100).toFixed(2) }}% × {{ result.optimal_duration - optimizationData.target_duration }} 天
+                  = {{ formatCurrency(optimizationData.contract_amount) }} × {{ (Number(optimizationData.penalty_rate) * 100).toFixed(2) }}% × {{ result.optimal_duration - optimizationData.target_duration }} {{ $t('common.days') }}
                 </template>
                 = <strong>{{ formatCurrency(result.penalty_amount) }}</strong>
                 <span v-if="optimizationData.contract_amount && Number(result.penalty_amount) >= Number(optimizationData.contract_amount) * 0.2" style="color: #EF4444;">
-                  （已達上限：合約總價的 20%）
+                  {{ $t('optimizationProcess.results.breakdown.capReached', { percent: 20 }) }}
                 </span>
               </span>
             </div>
             <div v-if="result.bonus_amount > 0" class="calc-step bonus">
-              <span class="calc-label">趕工獎金：</span>
+              <span class="calc-label">{{ $t('optimizationProcess.results.breakdown.bonusLabel') }}</span>
               <span class="calc-formula">
-                趕工獎金 = 合約總價 × 提前天數 ÷ 合約工期 × 5%
+                {{ $t('optimizationProcess.results.breakdown.bonusFormula') }}
                 <br>
                 <template v-if="optimizationData.contract_amount && optimizationData.contract_duration">
                   = {{ formatCurrency(optimizationData.contract_amount) }} × {{ optimizationData.target_duration - result.optimal_duration }} ÷ {{ optimizationData.contract_duration }} × 5%
                   = <strong>{{ formatCurrency(result.bonus_amount) }}</strong>
                   <span v-if="Number(result.bonus_amount) >= Number(optimizationData.contract_amount) * 0.01" style="color: #F59E0B;">
-                    （已達上限：合約總價的 1%）
+                    {{ $t('optimizationProcess.results.breakdown.capReached', { percent: 1 }) }}
                   </span>
                 </template>
                 <template v-else>
@@ -454,7 +453,7 @@
               </span>
             </div>
             <div class="calc-step total">
-              <span class="calc-label">總成本：</span>
+              <span class="calc-label">{{ $t('optimizationProcess.results.breakdown.totalLabel') }}</span>
               <span class="calc-formula">
                 {{ formatCurrency(result.optimal_cost) }} + {{ formatCurrency(result.indirect_cost) }}
                 <template v-if="result.penalty_amount > 0"> + {{ formatCurrency(result.penalty_amount) }}</template>
@@ -468,29 +467,30 @@
 
       <!-- 最優性證明 -->
       <div class="section">
-        <h3 class="section-title">六、最優性保證</h3>
+        <h3 class="section-title">{{ $t('optimizationProcess.optimality.title') }}</h3>
         <div class="content-box optimality">
           <div class="optimality-item">
             <el-icon class="icon-success"><CircleCheck /></el-icon>
             <div class="optimality-content">
-              <strong>全局最優解：</strong>
-              CBC 求解器使用精確演算法（分支定界法），保證找到的解為全局最優解，
-              而非局部最優解
+              <strong>{{ $t('optimizationProcess.optimality.global.title') }}</strong>
+              {{ $t('optimizationProcess.optimality.global.description') }}
             </div>
           </div>
           <div class="optimality-item">
             <el-icon class="icon-success"><CircleCheck /></el-icon>
             <div class="optimality-content">
-              <strong>可行性驗證：</strong>
-              所有限制式均已滿足，包括前置關係、工期/預算約束等
+              <strong>{{ $t('optimizationProcess.optimality.feasibility.title') }}</strong>
+              {{ $t('optimizationProcess.optimality.feasibility.description') }}
             </div>
           </div>
           <div class="optimality-item">
             <el-icon class="icon-success"><CircleCheck /></el-icon>
             <div class="optimality-content">
-              <strong>目標值最優：</strong>
-              在滿足所有限制式的前提下，目標函數值（{{ optimizationData.mode === 'budget_to_duration' ? '工期 + 獎懲' : '總成本 + 獎懲' }}）
-              已達到理論最小值，無法再進一步改善
+              <strong>{{ $t('optimizationProcess.optimality.optimal.title') }}</strong>
+              {{ optimizationData.mode === 'budget_to_duration' 
+                ? $t('optimizationProcess.optimality.optimal.descriptionDuration') 
+                : $t('optimizationProcess.optimality.optimal.descriptionCost') 
+              }}
             </div>
           </div>
         </div>
@@ -502,6 +502,9 @@
 <script setup>
 import { computed } from 'vue'
 import { Check, Clock, CircleCheck } from '@element-plus/icons-vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   result: {

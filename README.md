@@ -15,6 +15,10 @@
   - 模式二：給定工期，求最低成本
 - **結果分析**：查看優化結果、圖表視覺化
 - **報告匯出**：匯出 PDF 或 Excel 報告
+- **多語言支援**：完整的繁體中文與英文介面（NEW!）
+  - 即時語言切換
+  - 持久化語言偏好
+  - Element Plus UI 元件庫語言整合
 
 ## 技術架構
 
@@ -23,6 +27,7 @@
 - Element Plus (UI 元件庫)
 - ECharts (圖表庫)
 - Axios (HTTP 客戶端)
+- Vue I18n (國際化支援)
 - jsPDF + xlsx (報告生成)
 
 ### 後端
@@ -86,6 +91,24 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 npm run dev
 ```
 
+## 多語言功能 (NEW!)
+
+本系統現已支援完整的多語言介面：
+
+### 支援的語言
+- 繁體中文 (zh-TW)
+- English (en-US)
+
+### 使用方式
+1. 點擊頂部導航欄右上角的語言選擇器（地球圖標 🌐）
+2. 選擇您偏好的語言
+3. 系統會自動刷新並套用新語言設定
+4. 語言偏好會儲存在瀏覽器中，下次訪問時自動載入
+
+### 詳細說明
+完整的多語言實作指南請參考：[I18N Guide](docs/I18N_GUIDE.md)  
+English documentation: [README.en.md](README.en.md)
+
 ## 專案結構
 
 ```
@@ -95,6 +118,11 @@ npm run dev
 │   ├── views/               # 頁面視圖
 │   ├── services/            # API 服務層
 │   ├── utils/               # 工具函數
+│   ├── i18n/                # 國際化
+│   │   ├── index.js         # i18n 配置
+│   │   └── locales/         # 語言包
+│   │       ├── zh-TW.js     # 繁體中文
+│   │       └── en-US.js     # 英文
 │   └── router/              # 路由配置
 ├── backend/                 # 後端原始碼
 │   ├── app/
@@ -107,7 +135,9 @@ npm run dev
 │   ├── PRD.md               # 產品需求文件
 │   ├── UserManual.md        # 使用者手冊
 │   ├── FeatureCodeMap.md    # 功能與程式碼對應表
-│   └── ChatHistory.md       # 開發決策紀錄
+│   ├── I18N_GUIDE.md        # 多語言指南
+│   ├── ChatHistory.md       # 開發決策紀錄
+│   └── 專案成果報告書.md     # 專案成果報告
 └── supabase/
     └── migrations/          # 資料庫遷移腳本
 ```
@@ -119,7 +149,12 @@ npm run dev
 - [產品需求文件 (PRD)](docs/PRD.md)
 - [使用者手冊](docs/UserManual.md)
 - [功能與程式碼對應表](docs/FeatureCodeMap.md)
+- [多語言指南 (I18N Guide)](docs/I18N_GUIDE.md) ⭐ NEW!
 - [開發決策紀錄](docs/ChatHistory.md)
+- [專案成果報告書](docs/專案成果報告書.md)
+
+### 多語言文件
+- [English README](README.en.md) 🇬🇧
 
 ## 開發指南
 
