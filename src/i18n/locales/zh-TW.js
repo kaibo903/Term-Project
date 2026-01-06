@@ -272,7 +272,8 @@ export default {
       projectRequired: '請選擇專案',
       modeRequired: '請選擇決策模式',
       budgetRequired: '請輸入預算約束',
-      durationRequired: '請輸入工期約束'
+      durationRequired: '請輸入工期約束',
+      targetDurationRequired: '設定逾期違約金時，必須輸入目標工期'
     },
     
     // 訊息

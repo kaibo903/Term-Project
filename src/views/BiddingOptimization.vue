@@ -236,8 +236,11 @@
 
             <div class="form-row-new">
               <div class="form-item-new">
-                <label class="item-label">{{ $t('optimization.targetDuration') }}</label>
-                <el-form-item class="form-item-wrapper">
+                <label class="item-label">
+                  {{ $t('optimization.targetDuration') }}
+                  <span v-if="(optimizationForm.penalty_amount && optimizationForm.penalty_amount > 0) || (optimizationForm.penalty_rate && optimizationForm.penalty_rate > 0)" style="color: #F56C6C;">*</span>
+                </label>
+                <el-form-item prop="target_duration" class="form-item-wrapper">
                   <el-input-number
                     v-model="optimizationForm.target_duration"
                     :min="1"
@@ -488,6 +491,21 @@ const rules = computed(() => ({
       validator: (rule, value, callback) => {
         if (optimizationForm.value.mode === 'duration_to_cost' && !value) {
           callback(new Error(t('optimization.validation.durationRequired')))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
+    }
+  ],
+  target_duration: [
+    {
+      validator: (rule, value, callback) => {
+        // 如果設定了違約金（固定金額或比例），則必須輸入目標工期
+        const hasPenalty = (optimizationForm.value.penalty_amount && optimizationForm.value.penalty_amount > 0) || 
+                          (optimizationForm.value.penalty_rate && optimizationForm.value.penalty_rate > 0)
+        if (hasPenalty && !value) {
+          callback(new Error(t('optimization.validation.targetDurationRequired')))
         } else {
           callback()
         }

@@ -272,7 +272,8 @@ export default {
       projectRequired: 'Please select a project',
       modeRequired: 'Please select calculation mode',
       budgetRequired: 'Please enter budget constraint',
-      durationRequired: 'Please enter duration constraint'
+      durationRequired: 'Please enter duration constraint',
+      targetDurationRequired: 'Target duration is required when penalty is set'
     },
     
     // Messages
